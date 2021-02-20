@@ -3,7 +3,10 @@
 # Example Usage
 
 ```javascript
-// Create a GopherClient.
+// Import the client.
+import {GopherClient} from "https://deno.land/x/gopher/mod.ts";
+
+// Create a new GopherClient.
 const client = new GopherClient();
 
 // Download the Gopher server's menu.
