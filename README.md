@@ -35,8 +35,8 @@ const text = new TextDecoder().decode(bytes);
 # Getting Gopher+ attributes
 ```javascript
 // Having previously obtained the menu item (see basic example), attributes can
-// be set like so:
-client.downloadAttributes(myMenuItem)
+// be retrieved like so:
+client.populateAttributes(myMenuItem)
 console.log(myMenuItem);
 ```
 Results:
