@@ -20,18 +20,22 @@ export interface GopherRequestOptions {
 
 /** Options used when creating a new Gopher client. */
 export interface GopherClientOptions {
-  ProtocolVersion: GopherProtocol
+  /** Version of the protocol to use. */
+  ProtocolVersion: GopherProtocol,
 }
 
 /** Handler for RFC1436 Gopher. */
 export class GopherHandler {
+
+  constructor(private readonly options?:GopherClientOptions){};
+
   parseMenuBytes( buffer:Uint8Array): Menu {
     const menu = new TextDecoder().decode(buffer);
     return new Menu(menu.trim());
   }
 
   /** Generates a selector string to be sent to the server. */
-  generateRequestString(selector:string|undefined):string {
+  generateQueryString(selector:string|undefined):string {
     return `${selector || ''}\r\n`;
   }
 }
@@ -57,8 +61,12 @@ export class GopherPlusHandler extends GopherHandler {
     return new Menu(body.trim());
   }
 
-  generateRequestString(selector:string|undefined):string {
+  generateQueryString(selector:string|undefined):string {
     return `${selector || ''}\t+\r\n`;
+  }
+
+  generateAttributeQueryString(selector:string|undefined):string {
+    return `${selector || ''}\t!\r\n`;
   }
 }
 
@@ -83,15 +91,15 @@ export class GopherClient {
     this.protocolVersion = options?.ProtocolVersion || GopherProtocol.RFC1436;
 
     if (this.protocolVersion === GopherProtocol.RFC1436) {
-      this.handler = new GopherHandler();
+      this.handler = new GopherHandler(options);
     } else if (this.protocolVersion === GopherProtocol.GopherPlus) {
-      this.handler = new GopherPlusHandler();
+      this.handler = new GopherPlusHandler(options);
     }
   }
 
   /** Make a request to a Gopher server to download a menu. */
   async downloadMenu(options:GopherRequestOptions): Promise<Menu> {
-    const buffer = await this.downloadBytes(options);
+    const buffer = await this.downloadBytes(options, this.handler.generateQueryString(options.Selector));
     return this.handler.parseMenuBytes(buffer);
   }
 
@@ -103,7 +111,27 @@ export class GopherClient {
       Selector: menuItem.Selector,
     };
     if (menuItem.Type === "1") return await this.downloadMenu(options);
-    return await this.downloadBytes(options);
+    return await this.downloadBytes(options, this.handler.generateQueryString(options.Selector));
+  }
+
+  /** Get the Gopher+ attributes for a menu item. */
+  // TODO: refactor this into both handlers.
+  async downloadAttributes(menuItem:MenuItem): Promise<MenuItem> {
+    const options = {
+      Hostname: menuItem.Hostname,
+      Port: menuItem.Port,
+      Selector: menuItem.Selector,
+    };
+    if (this.protocolVersion !== GopherProtocol.GopherPlus) {
+      throw new Error('Attributes are only supported by Gopher+, but client is not using that protocol.');
+    }
+
+    const query = (this.handler as GopherPlusHandler).generateAttributeQueryString(menuItem.Selector);
+    const attributesBytes = await this.downloadBytes(options, query);
+    const attributes = new TextDecoder().decode(attributesBytes);
+    
+    return new MenuItem('');
+
   }
 
   /** Concatenate two UInt8Arrays. */
@@ -118,13 +146,13 @@ export class GopherClient {
    * Download bytes from a Gopher server. Makes no assumptions on type - ideal
    * for downloading text files or images etc.
    */
-  private async downloadBytes(options:GopherRequestOptions): Promise<Uint8Array> {
+  private async downloadBytes(options:GopherRequestOptions, query:string): Promise<Uint8Array> {
     const connection = await Deno.connect({
       hostname: options.Hostname,
       port: options.Port || 70,
       transport: "tcp"
     });
-    await connection.write(new TextEncoder().encode(this.handler.generateRequestString(options.Selector)));
+    await connection.write(new TextEncoder().encode(query));
     let result:Uint8Array = new Uint8Array(0);
     let buf = new Uint8Array(this.BUFFER_SIZE);
     let bytesRead: number | null = 0;
@@ -160,7 +188,33 @@ export abstract class GopherItem {
   Original: string = "";
 
   /** Gopher+ Attribute map for this item. May not be populated. */
-  Attributes: Map<string, string> = new Map<string,string>();
+  Attributes: Map<string, Map<string, string>> = new Map<string,Map<string,string>>();
+
+  /** Parses a string and converts it to attributes. */
+  parseAttributes(rawAttributes:string) {
+    // Spec does not say if attributes should be CRLF or just LF?
+    let lines = rawAttributes.split(`\n`);
+    // Shift off the first line (the Gopher+ status) since we don't care.
+    lines.shift();
+    if (!lines) return;
+    let lastAttribute = '';
+    for (const line of lines) {
+      if (line.startsWith('+')) {
+        const attributeName = line.substring(1,line.indexOf(':'));
+        // Forget about info since it is just a repeat of the selector.
+        if (attributeName === 'INFO') continue;
+        this.Attributes.set(attributeName, new Map<string, string>());
+        lastAttribute = attributeName;
+      } else {
+        if (!lastAttribute) continue;
+        const separator = line.indexOf(':');
+        const key = line.substring(0, separator).trim();
+        const value = line.substring(separator + 1).trim();
+        this.Attributes.get(lastAttribute!)!.set(key, value);
+      }
+    }
+    
+  }
 }
 
 export type ItemType = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
