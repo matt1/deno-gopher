@@ -1,7 +1,7 @@
 /** The type of the Gopher protocol. */
 export enum GopherProtocol {
   /** Standard/Original RFC1436 Gopher protocol. */
-  Gopher,
+  RFC1436,
   /** Gopher+ protocol. */
   GopherPlus,
 }
@@ -71,9 +71,9 @@ export class GopherClient {
   private readonly BUFFER_SIZE = 2048;
 
   constructor(options?:GopherClientOptions){
-    this.protocolVersion = options?.ProtocolVersion || GopherProtocol.Gopher;
+    this.protocolVersion = options?.ProtocolVersion || GopherProtocol.RFC1436;
 
-    if (this.protocolVersion === GopherProtocol.Gopher) {
+    if (this.protocolVersion === GopherProtocol.RFC1436) {
       this.handler = new GopherHandler();
     } else if (this.protocolVersion === GopherProtocol.GopherPlus) {
       this.handler = new GopherPlusHandler();

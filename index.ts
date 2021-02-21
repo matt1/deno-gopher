@@ -1,7 +1,7 @@
 import {GopherClient, GopherProtocol} from './gopher.ts';
 
 const client = new GopherClient({
-  ProtocolVersion: GopherProtocol.GopherPlus,
+  ProtocolVersion: GopherProtocol.RFC1436,
 });
 const menu = await client.downloadMenu({
   Hostname: 'gopher.quux.org',
