@@ -29,6 +29,11 @@ export class GopherHandler {
     const menu = new TextDecoder().decode(buffer);
     return new Menu(menu.trim());
   }
+
+  /** Generates a selector string to be sent to the server. */
+  generateRequestString(selector:string|undefined):string {
+    return `${selector || ''}\r\n`;
+  }
 }
 
 /** Handler for Gopher+. */
@@ -50,7 +55,11 @@ export class GopherPlusHandler extends GopherHandler {
       // Size specified in header and closes when connection closes - no-op.
     }
     return new Menu(body.trim());
-}
+  }
+
+  generateRequestString(selector:string|undefined):string {
+    return `${selector || ''}\t+\r\n`;
+  }
 }
 
 /** A client for interacting with Gopher servers. */
@@ -105,15 +114,6 @@ export class GopherClient {
     return result;
   }
 
-  /** Generates a selector string based on the protocol. */
-  private generateRequestString(selector:string|undefined):string {
-    let result = selector || '';
-    if (this.protocolVersion === GopherProtocol.GopherPlus) {
-      result = `${result}\t+`
-    }
-    return `${result}\r\n`;
-  }
-
   /** 
    * Download bytes from a Gopher server. Makes no assumptions on type - ideal
    * for downloading text files or images etc.
@@ -124,7 +124,7 @@ export class GopherClient {
       port: options.Port || 70,
       transport: "tcp"
     });
-    await connection.write(new TextEncoder().encode(this.generateRequestString(options.Selector)));
+    await connection.write(new TextEncoder().encode(this.handler.generateRequestString(options.Selector)));
     let result:Uint8Array = new Uint8Array(0);
     let buf = new Uint8Array(this.BUFFER_SIZE);
     let bytesRead: number | null = 0;
@@ -158,6 +158,9 @@ export abstract class GopherItem {
   Hostname: string = "";
   Port: number = 0;
   Original: string = "";
+
+  /** Gopher+ Attribute map for this item. May not be populated. */
+  Attributes: Map<string, string> = new Map<string,string>();
 }
 
 export type ItemType = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
