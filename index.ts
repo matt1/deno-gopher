@@ -13,4 +13,5 @@ for (const menuItem of menu.Items) {
   lastItem = menuItem;
 }
 
-await client.downloadAttributes(lastItem!);
+await client.populateAttributes(lastItem!);
+console.log(lastItem!);

@@ -1,4 +1,5 @@
-[RFC1436](https://tools.ietf.org/html/rfc1436) Gopher Client for Deno.
+[RFC1436](https://tools.ietf.org/html/rfc1436) Gopher Client for Deno, with 
+basic support for Gopher+
 
 # Example Usage
 
@@ -29,4 +30,30 @@ const bytes = client.downloadItem(menuItem);
 // If it was a text entry (use the MenuItem.Type field to check) then you can
 // easily convert to a string.
 const text = new TextDecoder().decode(bytes);
+```
+
+# Getting Gopher+ attributes
+```javascript
+// Having previously obtained the menu item (see basic example), attributes can
+// be set like so:
+client.downloadAttributes(myMenuItem)
+console.log(myMenuItem);
+```
+Results:
+```bash
+MenuItem {
+  Type: "0",
+  Name: "A file",
+  Selector: "/a file.txt",
+  Hostname: "gopher.example.com",
+  Port: 70,
+  Original: "0A file\t/a file.txt\tgopher.example.com\t70\t+",
+  Attributes: Map {
+    "ADMIN" => Map {
+        "Admin" => "Foo Bar <foobar@example.com>",
+        "Mod-Date" => "Sun Feb 21 20:19:18 2021 <20210221201918>"
+      },
+    "VIEWS" => Map { "text/plain" => "<1k>" }
+  }
+}
 ```

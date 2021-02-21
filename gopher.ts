@@ -116,7 +116,7 @@ export class GopherClient {
 
   /** Get the Gopher+ attributes for a menu item. */
   // TODO: refactor this into both handlers.
-  async downloadAttributes(menuItem:MenuItem): Promise<MenuItem> {
+  async populateAttributes(menuItem:MenuItem) {
     const options = {
       Hostname: menuItem.Hostname,
       Port: menuItem.Port,
@@ -129,9 +129,7 @@ export class GopherClient {
     const query = (this.handler as GopherPlusHandler).generateAttributeQueryString(menuItem.Selector);
     const attributesBytes = await this.downloadBytes(options, query);
     const attributes = new TextDecoder().decode(attributesBytes);
-    
-    return new MenuItem('');
-
+    menuItem.parseAttributes(attributes);
   }
 
   /** Concatenate two UInt8Arrays. */
@@ -210,6 +208,7 @@ export abstract class GopherItem {
         const separator = line.indexOf(':');
         const key = line.substring(0, separator).trim();
         const value = line.substring(separator + 1).trim();
+        if (!key || !value) continue;
         this.Attributes.get(lastAttribute!)!.set(key, value);
       }
     }
