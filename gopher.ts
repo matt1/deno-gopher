@@ -1,3 +1,6 @@
+/** Common CRLF (as per RFC etc) used in many places. */
+const CRLF = '\r\n';
+
 /** The type of the Gopher protocol. */
 export enum GopherProtocol {
   /** Standard/Original RFC1436 Gopher protocol. */
@@ -36,7 +39,7 @@ export class GopherHandler {
 
   /** Generates a selector string to be sent to the server. */
   generateQueryString(selector:string|undefined):string {
-    return `${selector || ''}\r\n`;
+    return `${selector || ''}${CRLF}`;
   }
 }
 
@@ -46,12 +49,12 @@ export class GopherPlusHandler extends GopherHandler {
     const menu = new TextDecoder().decode(buffer);
 
     // http://gopherinfo.somnolescent.net/documentation/gopherplus.html#2.3
-    const linefeed = menu.indexOf('\r\n');
+    const linefeed = menu.indexOf(CRLF);
     const header = menu.substring(0, linefeed);
     let body = menu.substring(linefeed);
     if (header === '+-1') {
       // Ends with fullstop on a single line.  Find last line and remove it.
-      const footerSeparator = body.indexOf('\r\n.\r\n');
+      const footerSeparator = body.indexOf(`${CRLF}.${CRLF}`);
       body = menu.substring(linefeed, footerSeparator);
     } else if (header === '+-2') {
       // Ends when connection closed - no-op.
@@ -62,11 +65,11 @@ export class GopherPlusHandler extends GopherHandler {
   }
 
   generateQueryString(selector:string|undefined):string {
-    return `${selector || ''}\t+\r\n`;
+    return `${selector || ''}\t+${CRLF}`;
   }
 
   generateAttributeQueryString(selector:string|undefined):string {
-    return `${selector || ''}\t!\r\n`;
+    return `${selector || ''}\t!${CRLF}`;
   }
 }
 
@@ -170,13 +173,30 @@ export class Menu {
 
   /** Generates a Gopher menu from the raw string returned from the server. */
   constructor(menuString: string) {
-    const lines = menuString.split("\r\n");
+    const lines = menuString.split(CRLF);
     for (const line of lines) {
       this.Items.push(new MenuItem(line));
     }
   }
 }
 
+
+/** Contains all of the Gopher+ attributes for a GopherItem. */
+export class ItemAttributes {
+  /** The name of the block, e.g. `INFO`, `VIEWS` etc. No leading `+`. */
+  Name: string = '';
+  /** The attribute block dedscriptor - e.g. `+INFO: <descriptor goes here>`. */
+  Descriptor!: string;
+  /** 
+   * The lines of the attribute block. This is typically treated as key values,
+   * but may just be strings, so we have both the raw string block and a map
+   * for convenience.
+   */
+  RawLines: string = '';
+  Lines: Map<string, string> = new Map<string, string>();
+}
+
+/** Represents an item in a Gopher menu. */
 export abstract class GopherItem {
   Type: ItemType = "?";
   Name: string = "";
@@ -186,7 +206,7 @@ export abstract class GopherItem {
   Original: string = "";
 
   /** Gopher+ Attribute map for this item. May not be populated. */
-  Attributes: Map<string, Map<string, string>> = new Map<string,Map<string,string>>();
+  Attributes: Map<string, ItemAttributes> = new Map<string, ItemAttributes>();
 
   /** Parses a string and converts it to attributes. */
   parseAttributes(rawAttributes:string) {
@@ -197,22 +217,24 @@ export abstract class GopherItem {
     if (!lines) return;
     let lastAttribute = '';
     for (const line of lines) {
+      const separator = line.indexOf(':');
       if (line.startsWith('+')) {
-        const attributeName = line.substring(1,line.indexOf(':'));
-        // Forget about info since it is just a repeat of the selector.
-        if (attributeName === 'INFO') continue;
-        this.Attributes.set(attributeName, new Map<string, string>());
+        const attributeName = line.substring(1, separator);
+        const descriptor = line.substring(separator + 1).trim();
+        const attr = new ItemAttributes();
+        attr.Name = attributeName;
+        attr.Descriptor = descriptor;
+        this.Attributes.set(attributeName, attr);
         lastAttribute = attributeName;
       } else {
-        if (!lastAttribute) continue;
-        const separator = line.indexOf(':');
+        if (!lastAttribute) continue;        
+        this.Attributes.get(lastAttribute)!.RawLines += `${line}${CRLF}`;
         const key = line.substring(0, separator).trim();
         const value = line.substring(separator + 1).trim();
         if (!key || !value) continue;
-        this.Attributes.get(lastAttribute!)!.set(key, value);
+        this.Attributes.get(lastAttribute)!.Lines.set(key, value);
       }
     }
-    
   }
 }
 
