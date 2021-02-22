@@ -68,6 +68,10 @@ export class GopherPlusHandler extends GopherHandler {
     return `${selector || ''}\t+${CRLF}`;
   }
 
+  generateMenuAttributeQueryString(selector:string|undefined):string {
+    return `${selector || ''}\t$${CRLF}`;
+  }
+
   generateAttributeQueryString(selector:string|undefined):string {
     return `${selector || ''}\t!${CRLF}`;
   }
@@ -117,17 +121,36 @@ export class GopherClient {
     return await this.downloadBytes(options, this.handler.generateQueryString(options.Selector));
   }
 
+  /** Get the Gopher+ attributes for the entire menu at once. */
+  async populateMenuAttributes(menu:Menu) {
+    // TODO: refactor this into handlers
+    if (this.protocolVersion !== GopherProtocol.GopherPlus) {
+      throw new Error('Attributes are only supported by Gopher+, but client is not using that protocol.');
+    }
+    const options = {
+      Hostname: menu.Hostname,
+      Port: menu.Port,
+      Selector: menu.Selector,
+    };
+
+    const query = (this.handler as GopherPlusHandler).generateMenuAttributeQueryString(menu.Selector);
+    const attributesBytes = await this.downloadBytes(options, query);
+    const attributes = new TextDecoder().decode(attributesBytes);
+    throw new Error('Not implemented');
+    // TODO: parse all attributes then assign to child menu items - menu.parseAttributes(attributes);
+  }
+
   /** Get the Gopher+ attributes for a menu item. */
-  // TODO: refactor this into both handlers.
   async populateAttributes(menuItem:MenuItem) {
+    // TODO: refactor this into handlers.
+    if (this.protocolVersion !== GopherProtocol.GopherPlus) {
+      throw new Error('Attributes are only supported by Gopher+, but client is not using that protocol.');
+    }
     const options = {
       Hostname: menuItem.Hostname,
       Port: menuItem.Port,
       Selector: menuItem.Selector,
     };
-    if (this.protocolVersion !== GopherProtocol.GopherPlus) {
-      throw new Error('Attributes are only supported by Gopher+, but client is not using that protocol.');
-    }
 
     const query = (this.handler as GopherPlusHandler).generateAttributeQueryString(menuItem.Selector);
     const attributesBytes = await this.downloadBytes(options, query);
@@ -166,20 +189,6 @@ export class GopherClient {
     return result;
   }
 }
-
-/** Represents a Gopher menu. */
-export class Menu {
-  Items: MenuItem[] = Array<MenuItem>();
-
-  /** Generates a Gopher menu from the raw string returned from the server. */
-  constructor(menuString: string) {
-    const lines = menuString.split(CRLF);
-    for (const line of lines) {
-      this.Items.push(new MenuItem(line));
-    }
-  }
-}
-
 
 /** Contains all of the Gopher+ attributes for a GopherItem. */
 export class ItemAttributes {
@@ -240,6 +249,22 @@ export abstract class GopherItem {
 
 export type ItemType = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
   | "+"| "g" | "I" | "T" | "d" | "h" | "i" | "s" | "?";
+
+/** Represents a Gopher top-level menu. */
+export class Menu extends GopherItem {
+  /** The items within this menu. */
+  Items: MenuItem[] = Array<MenuItem>();
+
+  /** Generates a Gopher menu from the raw string returned from the server. */
+  constructor(menuString: string) {
+    super();
+    const lines = menuString.split(CRLF);
+    for (const line of lines) {
+      if (!line) continue;
+      this.Items.push(new MenuItem(line));
+    }
+  }
+}
 
 /** Represents a single entry in a Gopher menu. */
 export class MenuItem extends GopherItem {

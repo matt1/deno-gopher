@@ -1,1 +1,1 @@
-export {GopherClient} from './gopher.ts';
+export * from './gopher.ts';

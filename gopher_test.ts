@@ -1,6 +1,46 @@
 import { assertEquals } from "https://deno.land/std@0.87.0/testing/asserts.ts";
-import { MenuItem } from "./gopher.ts";
+import { Menu, MenuItem } from "./gopher.ts";
 
+Deno.test("Menu parses well-formed menu", () => {
+  const menuStr = '1A Menu	/A/Menu	gopher.example.com	70\r\n' +
+                  '0A-Text_File!	/A Text File.txt	gopher.example.com	70	+\r\n' +
+                  'IAn image	/image.gif	gopher.example.com	70\r\n' +
+                  'iInformation	fake	(NULL)	0\r\n' +
+                  'i	fake	(NULL)	0\r\n';
+  const menu = new Menu(menuStr);
+
+  assertEquals(menu.Items.length, 5);
+  assertEquals(menu.Items[0].Type, '1');
+  assertEquals(menu.Items[0].Name, 'A Menu');
+  assertEquals(menu.Items[0].Selector, '/A/Menu');
+  assertEquals(menu.Items[0].Hostname, 'gopher.example.com');
+  assertEquals(menu.Items[0].Port, 70);
+
+  console.log(menu.Items);
+  assertEquals(menu.Items[1].Type, '0');
+  assertEquals(menu.Items[1].Name, 'A-Text_File!');
+  assertEquals(menu.Items[1].Selector, '/A Text File.txt');
+  assertEquals(menu.Items[1].Hostname, 'gopher.example.com');
+  assertEquals(menu.Items[1].Port, 70);
+
+  assertEquals(menu.Items[2].Type, 'I');
+  assertEquals(menu.Items[2].Name, 'An image');
+  assertEquals(menu.Items[2].Selector, '/image.gif');
+  assertEquals(menu.Items[2].Hostname, 'gopher.example.com');
+  assertEquals(menu.Items[2].Port, 70);
+
+  assertEquals(menu.Items[3].Type, 'i');
+  assertEquals(menu.Items[3].Name, 'Information');
+  assertEquals(menu.Items[3].Selector, 'fake');
+  assertEquals(menu.Items[3].Hostname, '(NULL)');
+  assertEquals(menu.Items[3].Port, 0);
+
+  assertEquals(menu.Items[4].Type, 'i');
+  assertEquals(menu.Items[4].Name, '');
+  assertEquals(menu.Items[4].Selector, 'fake');
+  assertEquals(menu.Items[4].Hostname, '(NULL)');
+  assertEquals(menu.Items[4].Port, 0);
+});
 
 Deno.test("MenuItem parses well-formed menu item", () => {
   const line = "1Home	/home	gopher.example.com	70";
