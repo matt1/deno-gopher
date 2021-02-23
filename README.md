@@ -1,4 +1,4 @@
-![tests workflow](https://github.com/matt1/deno-gopher/actions/workflows/deno.yml/badge.svg)
+[![tests workflow](https://github.com/matt1/deno-gopher/actions/workflows/deno.yml/badge.svg)](https://github.com/matt1/deno-gopher/actions/workflows/deno.yml)
 [![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https/deno.land/x/gopher/mod.ts)
 
 [RFC1436](https://tools.ietf.org/html/rfc1436) Gopher Client for Deno, with 
