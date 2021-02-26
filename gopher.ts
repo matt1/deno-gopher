@@ -110,14 +110,8 @@ export class GopherClient {
     return this.handler.parseMenuBytes(buffer);
   }
 
-  /** Make a request to the Gopher server to download an item. */
-  async downloadItem(menuItem:MenuItem): Promise<Uint8Array | Menu> {
-    const options = {
-      Hostname: menuItem.Hostname,
-      Port: menuItem.Port,
-      Selector: menuItem.Selector,
-    };
-    if (menuItem.Type === "1") return await this.downloadMenu(options);
+  /** Make a request to the Gopher server to download an item as raw bytes. */
+  async downloadItem(options:GopherRequestOptions): Promise<Uint8Array> {
     return await this.downloadBytes(options, this.handler.generateQueryString(options.Selector));
   }
 
