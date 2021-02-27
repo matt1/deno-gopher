@@ -27,12 +27,13 @@ for (const menuItem of menu.Items) {
   console.log(menuItem.toString());
 }
 
-// To download a single menu item as a UInt8Array payload:
-const bytes = client.downloadItem(menuItem);
+// To download a single menu item - the response contains the body and header
+// (if it was  Gopher+ response):
+const gopherResponse = client.downloadItem(menuItem);
 
 // If it was a text entry (use the MenuItem.Type field to check) then you can
 // easily convert to a string.
-const text = new TextDecoder().decode(bytes);
+const text = new TextDecoder().decode(gopherResponse.body);
 ```
 
 # Getting Gopher+ attributes

@@ -1,3 +1,5 @@
+import {GopherResponse} from './gopher_response.ts';
+
 /** Common CRLF (as per RFC etc) used in many places. */
 const CRLF = '\r\n';
 
@@ -107,11 +109,13 @@ export class GopherClient {
   /** Make a request to a Gopher server to download a menu. */
   async downloadMenu(options:GopherRequestOptions): Promise<Menu> {
     const buffer = await this.downloadBytes(options, this.handler.generateQueryString(options.Selector));
-    return this.handler.parseMenuBytes(buffer);
+    return this.handler.parseMenuBytes(buffer.body);
   }
 
   /** Make a request to the Gopher server to download an item as raw bytes. */
-  async downloadItem(options:GopherRequestOptions): Promise<Uint8Array> {
+  async downloadItem(options:GopherRequestOptions): Promise<GopherResponse> {
+    // TODO: if this is Gopher+, the client probably only cares about the raw
+    // bytes so strip out the Gopher+ header.
     return await this.downloadBytes(options, this.handler.generateQueryString(options.Selector));
   }
 
@@ -129,7 +133,7 @@ export class GopherClient {
 
     const query = (this.handler as GopherPlusHandler).generateMenuAttributeQueryString(menu.Selector);
     const attributesBytes = await this.downloadBytes(options, query);
-    const attributes = new TextDecoder().decode(attributesBytes);
+    const attributes = new TextDecoder().decode(attributesBytes.body);
     throw new Error('Not implemented');
     // TODO: parse all attributes then assign to child menu items - menu.parseAttributes(attributes);
   }
@@ -148,7 +152,7 @@ export class GopherClient {
 
     const query = (this.handler as GopherPlusHandler).generateAttributeQueryString(menuItem.Selector);
     const attributesBytes = await this.downloadBytes(options, query);
-    const attributes = new TextDecoder().decode(attributesBytes);
+    const attributes = new TextDecoder().decode(attributesBytes.body);
     menuItem.parseAttributes(attributes);
   }
 
@@ -164,7 +168,7 @@ export class GopherClient {
    * Download bytes from a Gopher server. Makes no assumptions on type - ideal
    * for downloading text files or images etc.
    */
-  private async downloadBytes(options:GopherRequestOptions, query:string): Promise<Uint8Array> {
+  private async downloadBytes(options:GopherRequestOptions, query:string): Promise<GopherResponse> {
     const connection = await Deno.connect({
       hostname: options.Hostname,
       port: options.Port || 70,
@@ -180,9 +184,11 @@ export class GopherClient {
       buf = new Uint8Array(this.BUFFER_SIZE);
     } while (bytesRead && bytesRead > 0);
     connection.close();
-    return result;
+    return new GopherResponse(result, this.protocolVersion);
   }
 }
+
+
 
 /** Contains all of the Gopher+ attributes for a GopherItem. */
 export class ItemAttributes {

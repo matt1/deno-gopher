@@ -16,7 +16,6 @@ Deno.test("Menu parses well-formed menu", () => {
   assertEquals(menu.Items[0].Hostname, 'gopher.example.com');
   assertEquals(menu.Items[0].Port, 70);
 
-  console.log(menu.Items);
   assertEquals(menu.Items[1].Type, '0');
   assertEquals(menu.Items[1].Name, 'A-Text_File!');
   assertEquals(menu.Items[1].Selector, '/A Text File.txt');
