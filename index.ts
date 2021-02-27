@@ -1,4 +1,4 @@
-import {GopherClient, GopherProtocol, MenuItem} from './gopher.ts';
+import {GopherClient, GopherProtocol, MenuItem} from './mod.ts';
 
 const client = new GopherClient({
   ProtocolVersion: GopherProtocol.GopherPlus,
