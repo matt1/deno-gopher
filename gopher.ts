@@ -1,3 +1,5 @@
+import { ItemType, TYPE_UNKNOWN } from "./gopher_types.ts";
+
 /** Common CRLF (as per RFC etc) used in many places. */
 export const CRLF = '\r\n';
 
@@ -38,7 +40,7 @@ export class ItemAttributes {
 
 /** Represents an item in a Gopher menu. */
 export abstract class GopherItem {
-  Type: ItemType = "?";
+  Type: ItemType = TYPE_UNKNOWN;
   Name: string = "";
   Selector: string = "fake";
   Hostname: string = "";
@@ -67,7 +69,7 @@ export abstract class GopherItem {
         this.Attributes.set(attributeName, attr);
         lastAttribute = attributeName;
       } else {
-        if (!lastAttribute) continue;        
+        if (!lastAttribute) continue;
         this.Attributes.get(lastAttribute)!.RawLines += `${line}${CRLF}`;
         const key = line.substring(0, separator).trim();
         const value = line.substring(separator + 1).trim();
@@ -77,9 +79,6 @@ export abstract class GopherItem {
     }
   }
 }
-
-export type ItemType = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
-  | "+"| "g" | "I" | "T" | "d" | "h" | "i" | "s" | "?";
 
 /** Represents a Gopher top-level menu. */
 export class Menu extends GopherItem {

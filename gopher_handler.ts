@@ -26,6 +26,7 @@ export class GopherPlusHandler extends GopherHandler {
     const linefeed = menu.indexOf(CRLF);
     const header = menu.substring(0, linefeed);
     let body = menu.substring(linefeed);
+    // TODO: use new GopherResponse
     if (header === '+-1') {
       // Ends with fullstop on a single line.  Find last line and remove it.
       const footerSeparator = body.indexOf(`${CRLF}.${CRLF}`);
