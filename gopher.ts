@@ -1,4 +1,4 @@
-import { ItemType, TYPE_UNKNOWN } from "./gopher_types.ts";
+import { ItemType, TYPE_UNKNOWN } from './gopher_types.ts';
 
 /** Common CRLF (as per RFC etc) used in many places. */
 export const CRLF = '\r\n';
@@ -29,11 +29,11 @@ export class ItemAttributes {
 /** Represents an item in a Gopher menu. */
 export abstract class GopherItem {
   Type: ItemType = TYPE_UNKNOWN;
-  Name: string = "";
-  Selector: string = "fake";
-  Hostname: string = "";
+  Name: string = '';
+  Selector: string = 'fake';
+  Hostname: string = '';
   Port: number = 0;
-  Original: string = "";
+  Original: string = '';
 
   /** Gopher+ Attribute map for this item. May not be populated. */
   Attributes: Map<string, ItemAttributes> = new Map<string, ItemAttributes>();
@@ -91,7 +91,7 @@ export class MenuItem extends GopherItem {
     super();
     this.Original = menuItemString;
     this.Type = menuItemString.substring(0, 1) as ItemType;
-    const parts = menuItemString.substring(1).split("\t");
+    const parts = menuItemString.substring(1).split('\t');
     this.Name = parts[0];
     this.Selector = parts[1];
     this.Hostname = parts[2];
@@ -99,7 +99,7 @@ export class MenuItem extends GopherItem {
   }
 
   toString(): string {
-    if (this.Selector === "fake" || this.Port === 0 || this.Hostname === "(NULL)") {
+    if (this.Selector === 'fake' || this.Port === 0 || this.Hostname === '(NULL)') {
       return `${this.Type} ${this.Name}`;
     }
     return `${this.Type} ${this.Name} gopher://${this.Hostname}:${this.Port}${this.Selector}`;

@@ -1,6 +1,6 @@
-import { GopherProtocol, Menu, MenuItem } from "./gopher.ts";
-import { GopherHandler, GopherPlusHandler } from "./gopher_handler.ts";
-import { GopherResponse } from "./gopher_response.ts";
+import { GopherProtocol, Menu, MenuItem } from './gopher.ts';
+import { GopherHandler, GopherPlusHandler } from './gopher_handler.ts';
+import { GopherResponse } from './gopher_response.ts';
 import {GopherRequest} from './gopher_request.ts';
 
 /** A client for interacting with Gopher servers. */
@@ -96,7 +96,7 @@ export class GopherClient {
     const connection = await Deno.connect({
       hostname: options.Hostname,
       port: options.Port || 70,
-      transport: "tcp"
+      transport: 'tcp'
     });
     await connection.write(new TextEncoder().encode(query));
     let result:Uint8Array = new Uint8Array(0);

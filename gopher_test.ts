@@ -1,7 +1,7 @@
-import { assertEquals } from "https://deno.land/std@0.87.0/testing/asserts.ts";
-import { Menu, MenuItem } from "./gopher.ts";
+import { assertEquals } from 'https://deno.land/std@0.87.0/testing/asserts.ts';
+import { Menu, MenuItem } from './gopher.ts';
 
-Deno.test("Menu parses well-formed menu", () => {
+Deno.test('Menu parses well-formed menu', () => {
   const menuStr = '1A Menu	/A/Menu	gopher.example.com	70\r\n' +
                   '0A-Text_File!	/A Text File.txt	gopher.example.com	70	+\r\n' +
                   'IAn image	/image.gif	gopher.example.com	70\r\n' +
@@ -41,62 +41,62 @@ Deno.test("Menu parses well-formed menu", () => {
   assertEquals(menu.Items[4].Port, 0);
 });
 
-Deno.test("MenuItem parses well-formed menu item", () => {
-  const line = "1Home	/home	gopher.example.com	70";
+Deno.test('MenuItem parses well-formed menu item', () => {
+  const line = '1Home	/home	gopher.example.com	70';
   const menuItem = new MenuItem(line);
 
-  assertEquals(menuItem.Type, "1");
-  assertEquals(menuItem.Name, "Home");
-  assertEquals(menuItem.Selector, "/home");
-  assertEquals(menuItem.Hostname, "gopher.example.com");
+  assertEquals(menuItem.Type, '1');
+  assertEquals(menuItem.Name, 'Home');
+  assertEquals(menuItem.Selector, '/home');
+  assertEquals(menuItem.Hostname, 'gopher.example.com');
   assertEquals(menuItem.Port, 70);
 });
 
-Deno.test("MenuItem parses well-formed Gopher+ menu item", () => {
-  const line = "1Home	/home	gopher.example.com	70	+";
+Deno.test('MenuItem parses well-formed Gopher+ menu item', () => {
+  const line = '1Home	/home	gopher.example.com	70	+';
   const menuItem = new MenuItem(line);
 
-  assertEquals(menuItem.Type, "1");
-  assertEquals(menuItem.Name, "Home");
-  assertEquals(menuItem.Selector, "/home");
-  assertEquals(menuItem.Hostname, "gopher.example.com");
+  assertEquals(menuItem.Type, '1');
+  assertEquals(menuItem.Name, 'Home');
+  assertEquals(menuItem.Selector, '/home');
+  assertEquals(menuItem.Hostname, 'gopher.example.com');
   assertEquals(menuItem.Port, 70);
 });
 
-Deno.test("MenuItem parses selectors with spaces", () => {
-  const line = "0One Two	/One Two.txt	gopher.example.com	70	+";
+Deno.test('MenuItem parses selectors with spaces', () => {
+  const line = '0One Two	/One Two.txt	gopher.example.com	70	+';
   const menuItem = new MenuItem(line);
 
-  assertEquals(menuItem.Type, "0");
-  assertEquals(menuItem.Name, "One Two");
-  assertEquals(menuItem.Selector, "/One Two.txt");
-  assertEquals(menuItem.Hostname, "gopher.example.com");
+  assertEquals(menuItem.Type, '0');
+  assertEquals(menuItem.Name, 'One Two');
+  assertEquals(menuItem.Selector, '/One Two.txt');
+  assertEquals(menuItem.Hostname, 'gopher.example.com');
   assertEquals(menuItem.Port, 70);
 });
 
-Deno.test("MenuItem parses informational menu item", () => {
-  const line = "iThis is info	fake	(NULL)	0";
+Deno.test('MenuItem parses informational menu item', () => {
+  const line = 'iThis is info	fake	(NULL)	0';
   const menuItem = new MenuItem(line);
 
-  assertEquals(menuItem.Type, "i");
-  assertEquals(menuItem.Name, "This is info");
-  assertEquals(menuItem.Selector, "fake");
-  assertEquals(menuItem.Hostname, "(NULL)");
+  assertEquals(menuItem.Type, 'i');
+  assertEquals(menuItem.Name, 'This is info');
+  assertEquals(menuItem.Selector, 'fake');
+  assertEquals(menuItem.Hostname, '(NULL)');
   assertEquals(menuItem.Port, 0);
 });
 
-Deno.test("MenuItem parses empty informational menu item", () => {
-  const line = "i	fake	(NULL)	0";
+Deno.test('MenuItem parses empty informational menu item', () => {
+  const line = 'i	fake	(NULL)	0';
   const menuItem = new MenuItem(line);
 
-  assertEquals(menuItem.Type, "i");
-  assertEquals(menuItem.Name, "");
-  assertEquals(menuItem.Selector, "fake");
-  assertEquals(menuItem.Hostname, "(NULL)");
+  assertEquals(menuItem.Type, 'i');
+  assertEquals(menuItem.Name, '');
+  assertEquals(menuItem.Selector, 'fake');
+  assertEquals(menuItem.Hostname, '(NULL)');
   assertEquals(menuItem.Port, 0);
 });
 
-Deno.test("MenuItem parses attributes", () => {
+Deno.test('MenuItem parses attributes', () => {
   const attributes = `+-2
 +INFO: 0whatsnew.txt	/whatsnew.txt	gopher.example.com 70	+
 +ADMIN:
@@ -106,13 +106,13 @@ Deno.test("MenuItem parses attributes", () => {
  text/plain: <1k>
  text/html: <2k>`
 
-  const menuItem = new MenuItem("1Home	/home	gopher.example.com	70");
+  const menuItem = new MenuItem('1Home	/home	gopher.example.com	70');
   menuItem.parseAttributes(attributes);
 
   assertEquals(menuItem.Attributes.get('INFO')!.Descriptor, '0whatsnew.txt	/whatsnew.txt	gopher.example.com 70	+');
-  assertEquals(menuItem.Attributes.get('ADMIN')!.Lines.get('Admin'), "Foo Bar <foobar@example.com>");
-  assertEquals(menuItem.Attributes.get('ADMIN')!.Lines.get('Mod-Date'), "Sun Feb 21 20:19:18 2021 <20210221201918>");
-  assertEquals(menuItem.Attributes.get('VIEWS')!.Lines.get('text/plain'), "<1k>");
-  assertEquals(menuItem.Attributes.get('VIEWS')!.Lines.get('text/html'), "<2k>");
+  assertEquals(menuItem.Attributes.get('ADMIN')!.Lines.get('Admin'), 'Foo Bar <foobar@example.com>');
+  assertEquals(menuItem.Attributes.get('ADMIN')!.Lines.get('Mod-Date'), 'Sun Feb 21 20:19:18 2021 <20210221201918>');
+  assertEquals(menuItem.Attributes.get('VIEWS')!.Lines.get('text/plain'), '<1k>');
+  assertEquals(menuItem.Attributes.get('VIEWS')!.Lines.get('text/html'), '<2k>');
   assertEquals(menuItem.Attributes.get('VIEWS')!.RawLines, ` text/plain: <1k>\r\n text/html: <2k>\r\n`);
 });

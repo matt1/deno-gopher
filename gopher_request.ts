@@ -1,4 +1,4 @@
-import { GopherProtocol } from "./gopher.ts";
+import { GopherProtocol } from './gopher.ts';
 
 /** Request made to a Gopher server. */
 export class GopherRequest {

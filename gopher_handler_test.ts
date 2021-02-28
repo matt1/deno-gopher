@@ -1,7 +1,7 @@
-import { assertEquals } from "https://deno.land/std@0.87.0/testing/asserts.ts";
-import { GopherProtocol } from "./gopher.ts";
-import { GopherHandler } from "./gopher_handler.ts";
-import { GopherResponse } from "./gopher_response.ts";
+import { assertEquals } from 'https://deno.land/std@0.87.0/testing/asserts.ts';
+import { GopherProtocol } from './gopher.ts';
+import { GopherHandler } from './gopher_handler.ts';
+import { GopherResponse } from './gopher_response.ts';
 
 const GOPHER0_RESPONSE = new TextEncoder().encode(
   '1A Menu	/A/Menu	gopher.example.com	70\r\n' +
@@ -12,7 +12,7 @@ const GOPHERP_RESPONSE = new TextEncoder().encode(
   '1A Menu	/A/Menu	gopher.example.com	70\r\n' +
   '0A-Text_File!	/A Text File.txt	gopher.example.com	70	+\r\n');
 
-Deno.test("GopherHandler parses well-formed Gopher0 response", () => {
+Deno.test('GopherHandler parses well-formed Gopher0 response', () => {
   const handler = new GopherHandler();
   const response = new GopherResponse(GOPHER0_RESPONSE, GopherProtocol.RFC1436);
 
@@ -31,7 +31,7 @@ Deno.test("GopherHandler parses well-formed Gopher0 response", () => {
   assertEquals(menu.Items[1].Port, 70);
 });
 
-Deno.test("GopherHandler parses well-formed Gopher+ response", () => {
+Deno.test('GopherHandler parses well-formed Gopher+ response', () => {
   const handler = new GopherHandler();
   const response = new GopherResponse(GOPHERP_RESPONSE, GopherProtocol.GopherPlus);
 

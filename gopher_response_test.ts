@@ -1,13 +1,13 @@
-import { assertEquals } from "https://deno.land/std@0.87.0/testing/asserts.ts";
-import { GopherProtocol } from "./gopher.ts";
-import { GopherResponse } from "./gopher_response.ts";
+import { assertEquals } from 'https://deno.land/std@0.87.0/testing/asserts.ts';
+import { GopherProtocol } from './gopher.ts';
+import { GopherResponse } from './gopher_response.ts';
 
 const GOPHER0_RESPONSE = new TextEncoder().encode('sample data');
 const GOPHERP_RESPONSE_PLUS_SIZE = new TextEncoder().encode('+11\r\nsample data');
 const GOPHERP_RESPONSE_PLUS_ONE = new TextEncoder().encode('+-1\r\nsample data plus 1\r\n.\r\n');
 const GOPHERP_RESPONSE_PLUS_TWO = new TextEncoder().encode('+-2\r\nsample data plus 2');
 
-Deno.test("GopherResponse handles normal Gopher0 response", () => {
+Deno.test('GopherResponse handles normal Gopher0 response', () => {
   const resp = new GopherResponse(GOPHER0_RESPONSE, GopherProtocol.RFC1436);
   assertEquals(resp.body, GOPHER0_RESPONSE);
 });
