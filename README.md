@@ -2,7 +2,7 @@
 [![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https/deno.land/x/gopher/mod.ts)
 
 [RFC1436](https://tools.ietf.org/html/rfc1436) Gopher Client for Deno, with 
-basic support for Gopher+
+basic support for [Gopher+](https://github.com/gopher-protocol/gopher-plus/blob/main/gopherplus.md).
 
 # Example Usage
 
