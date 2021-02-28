@@ -1,6 +1,7 @@
-import { GopherProtocol, GopherRequestOptions, Menu, MenuItem } from "./gopher.ts";
+import { GopherProtocol, Menu, MenuItem } from "./gopher.ts";
 import { GopherHandler, GopherPlusHandler } from "./gopher_handler.ts";
 import { GopherResponse } from "./gopher_response.ts";
+import {GopherRequest} from './gopher_request.ts';
 
 /** A client for interacting with Gopher servers. */
 export class GopherClient {
@@ -30,13 +31,13 @@ export class GopherClient {
   }
 
   /** Make a request to a Gopher server to download a menu. */
-  async downloadMenu(options:GopherRequestOptions): Promise<Menu> {
-    const buffer = await this.downloadBytes(options, this.handler.generateQueryString(options.Selector));
-    return this.handler.parseMenuBytes(buffer.body);
+  async downloadMenu(options:GopherRequest): Promise<Menu> {
+    const response = await this.downloadBytes(options, this.handler.generateQueryString(options.Selector));
+    return this.handler.parseMenu(response);
   }
 
   /** Make a request to the Gopher server to download an item as raw bytes. */
-  async downloadItem(options:GopherRequestOptions): Promise<GopherResponse> {
+  async downloadItem(options:GopherRequest): Promise<GopherResponse> {
     // TODO: if this is Gopher+, the client probably only cares about the raw
     // bytes so strip out the Gopher+ header.
     return await this.downloadBytes(options, this.handler.generateQueryString(options.Selector));
@@ -91,7 +92,7 @@ export class GopherClient {
    * Download bytes from a Gopher server. Makes no assumptions on type - ideal
    * for downloading text files or images etc.
    */
-  private async downloadBytes(options:GopherRequestOptions, query:string): Promise<GopherResponse> {
+  private async downloadBytes(options:GopherRequest, query:string): Promise<GopherResponse> {
     const connection = await Deno.connect({
       hostname: options.Hostname,
       port: options.Port || 70,
