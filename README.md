@@ -8,7 +8,7 @@ basic support for [Gopher+](https://github.com/gopher-protocol/gopher-plus/blob/
 
 ```javascript
 // Import the client.
-import {GopherClient} from "https://deno.land/x/gopher/mod.ts";
+import {GopherClient} from 'https://deno.land/x/gopher/mod.ts';
 
 // Create a new GopherClient, optionally specifying the protocol version to use.
 const client = new GopherClient({
@@ -19,7 +19,7 @@ const client = new GopherClient({
 const menu = await client.downloadMenu({
   Hostname: 'gopher.example.com',
   // Optional: Port (default 70)
-  // Optional: Selector (e.g. "/foo")
+  // Optional: Selector (e.g. '/foo')
 });
 
 // To display the menu items.
@@ -46,18 +46,18 @@ console.log(myMenuItem);
 Results:
 ```bash
 MenuItem {
-  Type: "0",
-  Name: "A file",
-  Selector: "/a file.txt",
-  Hostname: "gopher.example.com",
+  Type: '0',
+  Name: 'A file',
+  Selector: '/a file.txt',
+  Hostname: 'gopher.example.com',
   Port: 70,
-  Original: "0A file\t/a file.txt\tgopher.example.com\t70\t+",
+  Original: '0A file\t/a file.txt\tgopher.example.com\t70\t+',
   Attributes: Map {
-    "ADMIN" => Map {
-        "Admin" => "Foo Bar <foobar@example.com>",
-        "Mod-Date" => "Sun Feb 21 20:19:18 2021 <20210221201918>"
+    'ADMIN' => Map {
+        'Admin' => 'Foo Bar <foobar@example.com>',
+        'Mod-Date' => 'Sun Feb 21 20:19:18 2021 <20210221201918>'
       },
-    "VIEWS" => Map { "text/plain" => "<1k>" }
+    'VIEWS' => Map { 'text/plain' => '<1k>' }
   }
 }
 ```

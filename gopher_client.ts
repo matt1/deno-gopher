@@ -1,6 +1,7 @@
-import { GopherProtocol, Menu, MenuItem } from './gopher.ts';
-import { GopherHandler, GopherPlusHandler } from './gopher_handler.ts';
-import { GopherResponse } from './gopher_response.ts';
+import {GopherProtocol} from './gopher_common.ts';
+import {GopherHandler, GopherPlusHandler} from './gopher_handler.ts';
+import {Menu, MenuItem} from './gopher_menu.ts';
+import {GopherResponse} from './gopher_response.ts';
 import {GopherRequest} from './gopher_request.ts';
 
 /** A client for interacting with Gopher servers. */

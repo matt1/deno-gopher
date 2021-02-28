@@ -1,5 +1,5 @@
-import { assertEquals } from 'https://deno.land/std@0.87.0/testing/asserts.ts';
-import { Menu, MenuItem } from './gopher.ts';
+import {assertEquals} from 'https://deno.land/std@0.87.0/testing/asserts.ts';
+import {Menu, MenuItem} from './gopher_menu.ts';
 
 Deno.test('Menu parses well-formed menu', () => {
   const menuStr = '1A Menu	/A/Menu	gopher.example.com	70\r\n' +

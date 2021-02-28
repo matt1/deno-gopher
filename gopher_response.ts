@@ -1,4 +1,4 @@
-import {GopherProtocol} from './gopher.ts';
+import {GopherProtocol} from './gopher_common.ts';
 
 /** Represents a response from the Gopher server. */
 export class GopherResponse {

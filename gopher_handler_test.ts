@@ -1,7 +1,7 @@
-import { assertEquals } from 'https://deno.land/std@0.87.0/testing/asserts.ts';
-import { GopherProtocol } from './gopher.ts';
-import { GopherHandler } from './gopher_handler.ts';
-import { GopherResponse } from './gopher_response.ts';
+import {assertEquals} from 'https://deno.land/std@0.87.0/testing/asserts.ts';
+import {GopherProtocol} from './gopher_common.ts';
+import {GopherHandler} from './gopher_handler.ts';
+import {GopherResponse} from './gopher_response.ts';
 
 const GOPHER0_RESPONSE = new TextEncoder().encode(
   '1A Menu	/A/Menu	gopher.example.com	70\r\n' +

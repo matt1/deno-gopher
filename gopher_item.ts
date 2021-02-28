@@ -1,15 +1,5 @@
-import { ItemType, TYPE_UNKNOWN } from './gopher_types.ts';
-
-/** Common CRLF (as per RFC etc) used in many places. */
-export const CRLF = '\r\n';
-
-/** The type of the Gopher protocol. */
-export enum GopherProtocol {
-  /** Standard/Original RFC1436 Gopher protocol. */
-  RFC1436,
-  /** Gopher+ protocol. */
-  GopherPlus,
-}
+import {CRLF} from './gopher_common.ts';
+import {ItemType, UnknownType} from './gopher_types.ts';
 
 /** Contains all of the Gopher+ attributes for a GopherItem. */
 export class ItemAttributes {
@@ -28,7 +18,7 @@ export class ItemAttributes {
 
 /** Represents an item in a Gopher menu. */
 export abstract class GopherItem {
-  Type: ItemType = TYPE_UNKNOWN;
+  Type: ItemType = new UnknownType('?');
   Name: string = '';
   Selector: string = 'fake';
   Hostname: string = '';
@@ -65,43 +55,5 @@ export abstract class GopherItem {
         this.Attributes.get(lastAttribute)!.Lines.set(key, value);
       }
     }
-  }
-}
-
-/** Represents a Gopher top-level menu. */
-export class Menu extends GopherItem {
-  /** The items within this menu. */
-  Items: MenuItem[] = Array<MenuItem>();
-
-  /** Generates a Gopher menu from the raw string returned from the server. */
-  constructor(menuString: string) {
-    super();
-    const lines = menuString.split(CRLF);
-    for (const line of lines) {
-      if (!line) continue;
-      this.Items.push(new MenuItem(line));
-    }
-  }
-}
-
-/** Represents a single entry in a Gopher menu. */
-export class MenuItem extends GopherItem {
-
-  constructor(menuItemString: string) {
-    super();
-    this.Original = menuItemString;
-    this.Type = menuItemString.substring(0, 1) as ItemType;
-    const parts = menuItemString.substring(1).split('\t');
-    this.Name = parts[0];
-    this.Selector = parts[1];
-    this.Hostname = parts[2];
-    this.Port = Number(parts[3]);
-  }
-
-  toString(): string {
-    if (this.Selector === 'fake' || this.Port === 0 || this.Hostname === '(NULL)') {
-      return `${this.Type} ${this.Name}`;
-    }
-    return `${this.Type} ${this.Name} gopher://${this.Hostname}:${this.Port}${this.Selector}`;
   }
 }

@@ -1,4 +1,3 @@
-export const TYPE_UNKNOWN = '?';
 export const TYPE_TEXT = '0';
 export const TYPE_MENU = '1';
 export const TYPE_CCSO_NAMESERVER = '2';
@@ -22,9 +21,18 @@ export const TYPE_PLUS_IMAGE = ':';
 export const TYPE_PLUS_VIDEO = ';';
 export const TYPE_PLUS_AUDIO = '<';
 
+/** 
+ * An unknown Gopher menu type. Use this if you want to use a "new" type that
+ * is not part of the common spec.
+ */
+export class UnknownType {
+    constructor(public readonly character:string) {}
+}
 
-export type ItemType = typeof TYPE_UNKNOWN | typeof TYPE_TEXT | typeof TYPE_MENU | typeof TYPE_CCSO_NAMESERVER | typeof TYPE_ERROR |
-    typeof TYPE_BINHEX_FILE | typeof TYPE_DOS_FILE | typeof TYPE_UUENCODED_FILE | typeof TYPE_FULL_TEXT_SEARCH |
-    typeof TYPE_TELNET | typeof TYPE_BINARY_FILE | typeof TYPE_MIRROR | typeof TYPE_GIF | typeof TYPE_IMAGE |
-    typeof TYPE_TELNET_3270 | typeof TYPE_DOC | typeof TYPE_HTML | typeof TYPE_INFO | typeof TYPE_AUDIO |
-    typeof TYPE_PLUS_IMAGE | typeof TYPE_PLUS_VIDEO | typeof TYPE_PLUS_AUDIO;
+export type ItemType = UnknownType | typeof TYPE_TEXT | typeof TYPE_MENU |
+    typeof TYPE_CCSO_NAMESERVER | typeof TYPE_ERROR | typeof TYPE_BINHEX_FILE |
+    typeof TYPE_DOS_FILE | typeof TYPE_UUENCODED_FILE | typeof TYPE_FULL_TEXT_SEARCH |
+    typeof TYPE_TELNET | typeof TYPE_BINARY_FILE | typeof TYPE_MIRROR | typeof TYPE_GIF |
+    typeof TYPE_IMAGE | typeof TYPE_TELNET_3270 | typeof TYPE_DOC | typeof TYPE_HTML |
+    typeof TYPE_INFO | typeof TYPE_AUDIO |typeof TYPE_PLUS_IMAGE | typeof TYPE_PLUS_VIDEO |
+    typeof TYPE_PLUS_AUDIO;

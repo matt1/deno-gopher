@@ -1,6 +1,7 @@
-import { CRLF, Menu } from './gopher.ts';
-import { GopherClientOptions } from './gopher_client.ts';
-import { GopherResponse } from './gopher_response.ts";
+import {CRLF} from './gopher_common.ts';
+import {GopherClientOptions} from './gopher_client.ts';
+import {GopherResponse} from './gopher_response.ts';
+import {Menu} from './gopher_menu.ts';
 
 /** Handler for RFC1436 Gopher. */
 export class GopherHandler {

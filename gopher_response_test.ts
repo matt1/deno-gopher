@@ -1,6 +1,6 @@
-import { assertEquals } from 'https://deno.land/std@0.87.0/testing/asserts.ts';
-import { GopherProtocol } from './gopher.ts';
-import { GopherResponse } from './gopher_response.ts';
+import {assertEquals} from 'https://deno.land/std@0.87.0/testing/asserts.ts';
+import {GopherProtocol} from './gopher_common.ts';
+import {GopherResponse} from './gopher_response.ts';
 
 const GOPHER0_RESPONSE = new TextEncoder().encode('sample data');
 const GOPHERP_RESPONSE_PLUS_SIZE = new TextEncoder().encode('+11\r\nsample data');
