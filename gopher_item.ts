@@ -29,9 +29,9 @@ export abstract class GopherItem {
   Attributes: Map<string, ItemAttributes> = new Map<string, ItemAttributes>();
 
   /** Parses a string and converts it to attributes. */
-  parseAttributes(rawAttributes:string) {
+  parseAttributes(rawAttributesString:string) {
     // Spec does not say if attributes should be CRLF or just LF?
-    let lines = rawAttributes.split(`\n`);
+    let lines = rawAttributesString.split(`\n`);
     // Shift off the first line (the Gopher+ status) since we don't care.
     lines.shift();
     if (!lines) return;

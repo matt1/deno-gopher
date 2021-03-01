@@ -95,24 +95,3 @@ Deno.test('MenuItem parses empty informational menu item', () => {
   assertEquals(menuItem.Hostname, '(NULL)');
   assertEquals(menuItem.Port, 0);
 });
-
-Deno.test('MenuItem parses attributes', () => {
-  const attributes = `+-2
-+INFO: 0whatsnew.txt	/whatsnew.txt	gopher.example.com 70	+
-+ADMIN:
- Admin: Foo Bar <foobar@example.com>
- Mod-Date: Sun Feb 21 20:19:18 2021 <20210221201918>
-+VIEWS:
- text/plain: <1k>
- text/html: <2k>`
-
-  const menuItem = new MenuItem('1Home	/home	gopher.example.com	70');
-  menuItem.parseAttributes(attributes);
-
-  assertEquals(menuItem.Attributes.get('INFO')!.Descriptor, '0whatsnew.txt	/whatsnew.txt	gopher.example.com 70	+');
-  assertEquals(menuItem.Attributes.get('ADMIN')!.Lines.get('Admin'), 'Foo Bar <foobar@example.com>');
-  assertEquals(menuItem.Attributes.get('ADMIN')!.Lines.get('Mod-Date'), 'Sun Feb 21 20:19:18 2021 <20210221201918>');
-  assertEquals(menuItem.Attributes.get('VIEWS')!.Lines.get('text/plain'), '<1k>');
-  assertEquals(menuItem.Attributes.get('VIEWS')!.Lines.get('text/html'), '<2k>');
-  assertEquals(menuItem.Attributes.get('VIEWS')!.RawLines, ` text/plain: <1k>\r\n text/html: <2k>\r\n`);
-});
