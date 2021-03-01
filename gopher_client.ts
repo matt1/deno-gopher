@@ -100,21 +100,29 @@ export class GopherClient {
    * for downloading text files or images etc.
    */
   private async downloadBytes(options:GopherRequest, query:string): Promise<GopherResponse> {
-    const connection = await Deno.connect({
-      hostname: options.Hostname,
-      port: options.Port || 70,
-      transport: 'tcp'
-    });
-    await connection.write(new TextEncoder().encode(query));
+    let connection;
     let result:Uint8Array = new Uint8Array(0);
-    let buf = new Uint8Array(this.BUFFER_SIZE);
-    let bytesRead: number | null = 0;
-    do {
-      bytesRead = await connection.read(buf);
-      result = this.concatenateUint8Arrays(result, buf.slice(0, bytesRead!));
-      buf = new Uint8Array(this.BUFFER_SIZE);
-    } while (bytesRead && bytesRead > 0);
-    connection.close();
+    try {
+      connection = await Deno.connect({
+        hostname: options.Hostname,
+        port: options.Port || 70,
+        transport: 'tcp'
+      });
+      await connection.write(new TextEncoder().encode(query));
+      let buf = new Uint8Array(this.BUFFER_SIZE);
+      let bytesRead: number | null = 0;
+      do {
+        bytesRead = await connection.read(buf);
+        result = this.concatenateUint8Arrays(result, buf.slice(0, bytesRead!));
+        buf = new Uint8Array(this.BUFFER_SIZE);
+      } while (bytesRead && bytesRead > 0);
+    } catch (error) {
+      throw new Error(`Error downloading bytes from Gopher server: ${error}.`);
+    } finally {
+      if (connection) {
+        connection.close();
+      }
+    }
     return new GopherResponse(result, this.protocolVersion);
   }
 }
