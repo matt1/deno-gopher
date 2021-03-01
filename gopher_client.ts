@@ -32,16 +32,18 @@ export class GopherClient {
   }
 
   /** Make a request to a Gopher server to download a menu. */
-  async downloadMenu(options:GopherRequest): Promise<Menu> {
-    const response = await this.downloadBytes(options, this.handler.generateQueryString(options.Selector));
-    return this.handler.parseMenu(response);
+  async downloadMenu(request:GopherRequest): Promise<Menu> {
+    const response = await this.downloadBytes(request, this.handler.generateQueryString(request.Selector));
+    const menu =  this.handler.parseMenu(response);
+    menu.Hostname = request.Hostname;
+    menu.Port = request.Port || 70;
+    menu.Selector = request.Selector || '';
+    return menu;
   }
 
   /** Make a request to the Gopher server to download an item as raw bytes. */
-  async downloadItem(options:GopherRequest): Promise<GopherResponse> {
-    // TODO: if this is Gopher+, the client probably only cares about the raw
-    // bytes so strip out the Gopher+ header.
-    return await this.downloadBytes(options, this.handler.generateQueryString(options.Selector));
+  async downloadItem(request:GopherRequest): Promise<GopherResponse> {
+    return await this.downloadBytes(request, this.handler.generateQueryString(request.Selector));
   }
 
   /** Get the Gopher+ attributes for the entire menu at once. */
@@ -52,15 +54,19 @@ export class GopherClient {
     }
     const options = {
       Hostname: menu.Hostname,
-      Port: menu.Port,
-      Selector: menu.Selector,
+      Port: menu.Port || 70,
+      Selector: menu.Selector || '',
     };
 
     const query = (this.handler as GopherPlusHandler).generateMenuAttributeQueryString(menu.Selector);
     const attributesBytes = await this.downloadBytes(options, query);
     const attributes = new TextDecoder().decode(attributesBytes.body);
+    // TODO: this is a mess - we need to split the raw attributes by `+INFO` and
+    // then match each attribute to a MenuItem in this Menu, and then have that
+    // MenuItem parse its own string.
+    const attributesPerFile = attributes.split('+INFO:');
+
     throw new Error('Not implemented');
-    // TODO: parse all attributes then assign to child menu items - menu.parseAttributes(attributes);
   }
 
   /** Get the Gopher+ attributes for a menu item. */
@@ -71,8 +77,8 @@ export class GopherClient {
     }
     const options = {
       Hostname: menuItem.Hostname,
-      Port: menuItem.Port,
-      Selector: menuItem.Selector,
+      Port: menuItem.Port || 70,
+      Selector: menuItem.Selector || '',
     };
 
     const query = (this.handler as GopherPlusHandler).generateAttributeQueryString(menuItem.Selector);
