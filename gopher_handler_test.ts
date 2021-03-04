@@ -17,18 +17,18 @@ Deno.test('GopherHandler parses well-formed Gopher0 response', () => {
   const response = new GopherResponse(GOPHER0_RESPONSE, GopherProtocol.RFC1436);
 
   const menu = handler.parseMenu(response);
-  assertEquals(menu.Items.length, 2);
-  assertEquals(menu.Items[0].type, '1');
-  assertEquals(menu.Items[0].name, 'A Menu');
-  assertEquals(menu.Items[0].selector, '/A/Menu');
-  assertEquals(menu.Items[0].hostname, 'gopher.example.com');
-  assertEquals(menu.Items[0].port, 70);
+  assertEquals(menu.items.length, 2);
+  assertEquals(menu.items[0].type, '1');
+  assertEquals(menu.items[0].name, 'A Menu');
+  assertEquals(menu.items[0].selector, '/A/Menu');
+  assertEquals(menu.items[0].hostname, 'gopher.example.com');
+  assertEquals(menu.items[0].port, 70);
 
-  assertEquals(menu.Items[1].type, '0');
-  assertEquals(menu.Items[1].name, 'A-Text_File!');
-  assertEquals(menu.Items[1].selector, '/A Text File.txt');
-  assertEquals(menu.Items[1].hostname, 'gopher.example.com');
-  assertEquals(menu.Items[1].port, 70);
+  assertEquals(menu.items[1].type, '0');
+  assertEquals(menu.items[1].name, 'A-Text_File!');
+  assertEquals(menu.items[1].selector, '/A Text File.txt');
+  assertEquals(menu.items[1].hostname, 'gopher.example.com');
+  assertEquals(menu.items[1].port, 70);
 });
 
 Deno.test('GopherHandler parses well-formed Gopher+ response', () => {
@@ -36,16 +36,16 @@ Deno.test('GopherHandler parses well-formed Gopher+ response', () => {
   const response = new GopherResponse(GOPHERP_RESPONSE, GopherProtocol.GopherPlus);
 
   const menu = handler.parseMenu(response);
-  assertEquals(menu.Items.length, 2);
-  assertEquals(menu.Items[0].type, '1');
-  assertEquals(menu.Items[0].name, 'A Menu');
-  assertEquals(menu.Items[0].selector, '/A/Menu');
-  assertEquals(menu.Items[0].hostname, 'gopher.example.com');
-  assertEquals(menu.Items[0].port, 70);
+  assertEquals(menu.items.length, 2);
+  assertEquals(menu.items[0].type, '1');
+  assertEquals(menu.items[0].name, 'A Menu');
+  assertEquals(menu.items[0].selector, '/A/Menu');
+  assertEquals(menu.items[0].hostname, 'gopher.example.com');
+  assertEquals(menu.items[0].port, 70);
 
-  assertEquals(menu.Items[1].type, '0');
-  assertEquals(menu.Items[1].name, 'A-Text_File!');
-  assertEquals(menu.Items[1].selector, '/A Text File.txt');
-  assertEquals(menu.Items[1].hostname, 'gopher.example.com');
-  assertEquals(menu.Items[1].port, 70);
+  assertEquals(menu.items[1].type, '0');
+  assertEquals(menu.items[1].name, 'A-Text_File!');
+  assertEquals(menu.items[1].selector, '/A Text File.txt');
+  assertEquals(menu.items[1].hostname, 'gopher.example.com');
+  assertEquals(menu.items[1].port, 70);
 });

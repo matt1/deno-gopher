@@ -5,7 +5,7 @@ import {ItemType} from './gopher_types.ts';
 /** Represents a Gopher top-level menu. */
 export class Menu extends GopherItem {
   /** The items within this menu. */
-  Items: MenuItem[] = Array<MenuItem>();
+  items: MenuItem[] = Array<MenuItem>();
 
   /** Generates a Gopher menu from the raw string returned from the server. */
   constructor(menuString: string) {
@@ -13,7 +13,7 @@ export class Menu extends GopherItem {
     const lines = menuString.split(CRLF);
     for (const line of lines) {
       if (!line) continue;
-      this.Items.push(new MenuItem(line));
+      this.items.push(new MenuItem(line));
     }
   }
 }

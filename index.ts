@@ -1,16 +1,16 @@
 import {GopherClient, GopherProtocol, MenuItem} from './mod.ts';
 
 const client = new GopherClient({
-  ProtocolVersion: GopherProtocol.GopherPlus,
+  protocolVersion: GopherProtocol.GopherPlus,
 });
 
 try {
   const menu = await client.downloadMenu({
-    Hostname: 'gopher.quux.org',
+    hostname: 'gopher.quux.org',
   });
 
   let lastItem:MenuItem;
-  for (const menuItem of menu.Items) {
+  for (const menuItem of menu.items) {
     console.log(menuItem.toString());
     lastItem = menuItem;
   }

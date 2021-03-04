@@ -9,36 +9,36 @@ Deno.test('Menu parses well-formed menu', () => {
                   'i	fake	(NULL)	0\r\n';
   const menu = new Menu(menuStr);
 
-  assertEquals(menu.Items.length, 5);
-  assertEquals(menu.Items[0].type, '1');
-  assertEquals(menu.Items[0].name, 'A Menu');
-  assertEquals(menu.Items[0].selector, '/A/Menu');
-  assertEquals(menu.Items[0].hostname, 'gopher.example.com');
-  assertEquals(menu.Items[0].port, 70);
+  assertEquals(menu.items.length, 5);
+  assertEquals(menu.items[0].type, '1');
+  assertEquals(menu.items[0].name, 'A Menu');
+  assertEquals(menu.items[0].selector, '/A/Menu');
+  assertEquals(menu.items[0].hostname, 'gopher.example.com');
+  assertEquals(menu.items[0].port, 70);
 
-  assertEquals(menu.Items[1].type, '0');
-  assertEquals(menu.Items[1].name, 'A-Text_File!');
-  assertEquals(menu.Items[1].selector, '/A Text File.txt');
-  assertEquals(menu.Items[1].hostname, 'gopher.example.com');
-  assertEquals(menu.Items[1].port, 70);
+  assertEquals(menu.items[1].type, '0');
+  assertEquals(menu.items[1].name, 'A-Text_File!');
+  assertEquals(menu.items[1].selector, '/A Text File.txt');
+  assertEquals(menu.items[1].hostname, 'gopher.example.com');
+  assertEquals(menu.items[1].port, 70);
 
-  assertEquals(menu.Items[2].type, 'I');
-  assertEquals(menu.Items[2].name, 'An image');
-  assertEquals(menu.Items[2].selector, '/image.gif');
-  assertEquals(menu.Items[2].hostname, 'gopher.example.com');
-  assertEquals(menu.Items[2].port, 70);
+  assertEquals(menu.items[2].type, 'I');
+  assertEquals(menu.items[2].name, 'An image');
+  assertEquals(menu.items[2].selector, '/image.gif');
+  assertEquals(menu.items[2].hostname, 'gopher.example.com');
+  assertEquals(menu.items[2].port, 70);
 
-  assertEquals(menu.Items[3].type, 'i');
-  assertEquals(menu.Items[3].name, 'Information');
-  assertEquals(menu.Items[3].selector, 'fake');
-  assertEquals(menu.Items[3].hostname, '(NULL)');
-  assertEquals(menu.Items[3].port, 0);
+  assertEquals(menu.items[3].type, 'i');
+  assertEquals(menu.items[3].name, 'Information');
+  assertEquals(menu.items[3].selector, 'fake');
+  assertEquals(menu.items[3].hostname, '(NULL)');
+  assertEquals(menu.items[3].port, 0);
 
-  assertEquals(menu.Items[4].type, 'i');
-  assertEquals(menu.Items[4].name, '');
-  assertEquals(menu.Items[4].selector, 'fake');
-  assertEquals(menu.Items[4].hostname, '(NULL)');
-  assertEquals(menu.Items[4].port, 0);
+  assertEquals(menu.items[4].type, 'i');
+  assertEquals(menu.items[4].name, '');
+  assertEquals(menu.items[4].selector, 'fake');
+  assertEquals(menu.items[4].hostname, '(NULL)');
+  assertEquals(menu.items[4].port, 0);
 });
 
 Deno.test('MenuItem parses well-formed menu item', () => {
