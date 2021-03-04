@@ -22,7 +22,7 @@ export class GopherClient {
   private readonly BUFFER_SIZE = 2048;
 
   constructor(options?:GopherClientOptions){
-    this.protocolVersion = options?.ProtocolVersion || GopherProtocol.RFC1436;
+    this.protocolVersion = options?.protocolVersion || GopherProtocol.RFC1436;
 
     if (this.protocolVersion === GopherProtocol.RFC1436) {
       this.handler = new GopherHandler(options);
@@ -33,17 +33,17 @@ export class GopherClient {
 
   /** Make a request to a Gopher server to download a menu. */
   async downloadMenu(request:GopherRequest): Promise<Menu> {
-    const response = await this.downloadBytes(request, this.handler.generateQueryString(request.Selector));
+    const response = await this.downloadBytes(request, this.handler.generateQueryString(request.selector));
     const menu =  this.handler.parseMenu(response);
-    menu.Hostname = request.Hostname;
-    menu.Port = request.Port || 70;
-    menu.Selector = request.Selector || '';
+    menu.hostname = request.hostname;
+    menu.port = request.port || 70;
+    menu.selector = request.selector || '';
     return menu;
   }
 
   /** Make a request to the Gopher server to download an item as raw bytes. */
   async downloadItem(request:GopherRequest): Promise<GopherResponse> {
-    return await this.downloadBytes(request, this.handler.generateQueryString(request.Selector));
+    return await this.downloadBytes(request, this.handler.generateQueryString(request.selector));
   }
 
   /** Get the Gopher+ attributes for the entire menu at once. */
@@ -53,12 +53,12 @@ export class GopherClient {
       throw new Error('Attributes are only supported by Gopher+, but client is not using that protocol.');
     }
     const options = {
-      Hostname: menu.Hostname,
-      Port: menu.Port || 70,
-      Selector: menu.Selector || '',
+      hostname: menu.hostname,
+      port: menu.port || 70,
+      selector: menu.selector || '',
     };
 
-    const query = (this.handler as GopherPlusHandler).generateMenuAttributeQueryString(menu.Selector);
+    const query = (this.handler as GopherPlusHandler).generateMenuAttributeQueryString(menu.selector);
     const attributesBytes = await this.downloadBytes(options, query);
     const attributes = new TextDecoder().decode(attributesBytes.body);
     // TODO: this is a mess - we need to split the raw attributes by `+INFO` and
@@ -76,12 +76,12 @@ export class GopherClient {
       throw new Error('Attributes are only supported by Gopher+, but client is not using that protocol.');
     }
     const options = {
-      Hostname: menuItem.Hostname,
-      Port: menuItem.Port || 70,
-      Selector: menuItem.Selector || '',
+      hostname: menuItem.hostname,
+      port: menuItem.port || 70,
+      selector: menuItem.selector || '',
     };
 
-    const query = (this.handler as GopherPlusHandler).generateAttributeQueryString(menuItem.Selector);
+    const query = (this.handler as GopherPlusHandler).generateAttributeQueryString(menuItem.selector);
     const attributesBytes = await this.downloadBytes(options, query);
     const attributes = new TextDecoder().decode(attributesBytes.body);
     menuItem.parseAttributes(attributes);
@@ -104,8 +104,8 @@ export class GopherClient {
     let result:Uint8Array = new Uint8Array(0);
     try {
       connection = await Deno.connect({
-        hostname: options.Hostname,
-        port: options.Port || 70,
+        hostname: options.hostname,
+        port: options.port || 70,
         transport: 'tcp'
       });
       await connection.write(new TextEncoder().encode(query));
@@ -130,5 +130,5 @@ export class GopherClient {
 /** Options used when creating a new Gopher client. */
 export interface GopherClientOptions {
   /** Version of the protocol to use. */
-  ProtocolVersion: GopherProtocol,
+  protocolVersion: GopherProtocol,
 }

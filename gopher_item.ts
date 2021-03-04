@@ -4,29 +4,29 @@ import {ItemType, UnknownType} from './gopher_types.ts';
 /** Contains all of the Gopher+ attributes for a GopherItem. */
 export class ItemAttributes {
   /** The name of the block, e.g. `INFO`, `VIEWS` etc. No leading `+`. */
-  Name: string = '';
+  name: string = '';
   /** The attribute block dedscriptor - e.g. `+INFO: <descriptor goes here>`. */
-  Descriptor!: string;
+  descriptor!: string;
   /** 
    * The lines of the attribute block. This is typically treated as key values,
    * but may just be strings, so we have both the raw string block and a map
    * for convenience.
    */
-  RawLines: string = '';
-  Lines: Map<string, string> = new Map<string, string>();
+  rawLines: string = '';
+  lines: Map<string, string> = new Map<string, string>();
 }
 
 /** Represents an item in a Gopher menu. */
 export abstract class GopherItem {
-  Type: ItemType = new UnknownType('?');
-  Name: string = '';
-  Selector: string = 'fake';
-  Hostname: string = '';
-  Port: number = 0;
-  Original: string = '';
+  type: ItemType = new UnknownType('?');
+  name: string = '';
+  selector: string = 'fake';
+  hostname: string = '';
+  port: number = 0;
+  original: string = '';
 
   /** Gopher+ Attribute map for this item. May not be populated. */
-  Attributes: Map<string, ItemAttributes> = new Map<string, ItemAttributes>();
+  attributes: Map<string, ItemAttributes> = new Map<string, ItemAttributes>();
 
   /** Parses a string and converts it to attributes. */
   parseAttributes(rawAttributesString:string) {
@@ -42,17 +42,17 @@ export abstract class GopherItem {
         const attributeName = line.substring(1, separator);
         const descriptor = line.substring(separator + 1).trim();
         const attr = new ItemAttributes();
-        attr.Name = attributeName;
-        attr.Descriptor = descriptor;
-        this.Attributes.set(attributeName, attr);
+        attr.name = attributeName;
+        attr.descriptor = descriptor;
+        this.attributes.set(attributeName, attr);
         lastAttribute = attributeName;
       } else {
         if (!lastAttribute) continue;
-        this.Attributes.get(lastAttribute)!.RawLines += `${line}${CRLF}`;
+        this.attributes.get(lastAttribute)!.rawLines += `${line}${CRLF}`;
         const key = line.substring(0, separator).trim();
         const value = line.substring(separator + 1).trim();
         if (!key || !value) continue;
-        this.Attributes.get(lastAttribute)!.Lines.set(key, value);
+        this.attributes.get(lastAttribute)!.lines.set(key, value);
       }
     }
   }

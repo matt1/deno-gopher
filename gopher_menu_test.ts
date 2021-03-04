@@ -10,88 +10,88 @@ Deno.test('Menu parses well-formed menu', () => {
   const menu = new Menu(menuStr);
 
   assertEquals(menu.Items.length, 5);
-  assertEquals(menu.Items[0].Type, '1');
-  assertEquals(menu.Items[0].Name, 'A Menu');
-  assertEquals(menu.Items[0].Selector, '/A/Menu');
-  assertEquals(menu.Items[0].Hostname, 'gopher.example.com');
-  assertEquals(menu.Items[0].Port, 70);
+  assertEquals(menu.Items[0].type, '1');
+  assertEquals(menu.Items[0].name, 'A Menu');
+  assertEquals(menu.Items[0].selector, '/A/Menu');
+  assertEquals(menu.Items[0].hostname, 'gopher.example.com');
+  assertEquals(menu.Items[0].port, 70);
 
-  assertEquals(menu.Items[1].Type, '0');
-  assertEquals(menu.Items[1].Name, 'A-Text_File!');
-  assertEquals(menu.Items[1].Selector, '/A Text File.txt');
-  assertEquals(menu.Items[1].Hostname, 'gopher.example.com');
-  assertEquals(menu.Items[1].Port, 70);
+  assertEquals(menu.Items[1].type, '0');
+  assertEquals(menu.Items[1].name, 'A-Text_File!');
+  assertEquals(menu.Items[1].selector, '/A Text File.txt');
+  assertEquals(menu.Items[1].hostname, 'gopher.example.com');
+  assertEquals(menu.Items[1].port, 70);
 
-  assertEquals(menu.Items[2].Type, 'I');
-  assertEquals(menu.Items[2].Name, 'An image');
-  assertEquals(menu.Items[2].Selector, '/image.gif');
-  assertEquals(menu.Items[2].Hostname, 'gopher.example.com');
-  assertEquals(menu.Items[2].Port, 70);
+  assertEquals(menu.Items[2].type, 'I');
+  assertEquals(menu.Items[2].name, 'An image');
+  assertEquals(menu.Items[2].selector, '/image.gif');
+  assertEquals(menu.Items[2].hostname, 'gopher.example.com');
+  assertEquals(menu.Items[2].port, 70);
 
-  assertEquals(menu.Items[3].Type, 'i');
-  assertEquals(menu.Items[3].Name, 'Information');
-  assertEquals(menu.Items[3].Selector, 'fake');
-  assertEquals(menu.Items[3].Hostname, '(NULL)');
-  assertEquals(menu.Items[3].Port, 0);
+  assertEquals(menu.Items[3].type, 'i');
+  assertEquals(menu.Items[3].name, 'Information');
+  assertEquals(menu.Items[3].selector, 'fake');
+  assertEquals(menu.Items[3].hostname, '(NULL)');
+  assertEquals(menu.Items[3].port, 0);
 
-  assertEquals(menu.Items[4].Type, 'i');
-  assertEquals(menu.Items[4].Name, '');
-  assertEquals(menu.Items[4].Selector, 'fake');
-  assertEquals(menu.Items[4].Hostname, '(NULL)');
-  assertEquals(menu.Items[4].Port, 0);
+  assertEquals(menu.Items[4].type, 'i');
+  assertEquals(menu.Items[4].name, '');
+  assertEquals(menu.Items[4].selector, 'fake');
+  assertEquals(menu.Items[4].hostname, '(NULL)');
+  assertEquals(menu.Items[4].port, 0);
 });
 
 Deno.test('MenuItem parses well-formed menu item', () => {
   const line = '1Home	/home	gopher.example.com	70';
   const menuItem = new MenuItem(line);
 
-  assertEquals(menuItem.Type, '1');
-  assertEquals(menuItem.Name, 'Home');
-  assertEquals(menuItem.Selector, '/home');
-  assertEquals(menuItem.Hostname, 'gopher.example.com');
-  assertEquals(menuItem.Port, 70);
+  assertEquals(menuItem.type, '1');
+  assertEquals(menuItem.name, 'Home');
+  assertEquals(menuItem.selector, '/home');
+  assertEquals(menuItem.hostname, 'gopher.example.com');
+  assertEquals(menuItem.port, 70);
 });
 
 Deno.test('MenuItem parses well-formed Gopher+ menu item', () => {
   const line = '1Home	/home	gopher.example.com	70	+';
   const menuItem = new MenuItem(line);
 
-  assertEquals(menuItem.Type, '1');
-  assertEquals(menuItem.Name, 'Home');
-  assertEquals(menuItem.Selector, '/home');
-  assertEquals(menuItem.Hostname, 'gopher.example.com');
-  assertEquals(menuItem.Port, 70);
+  assertEquals(menuItem.type, '1');
+  assertEquals(menuItem.name, 'Home');
+  assertEquals(menuItem.selector, '/home');
+  assertEquals(menuItem.hostname, 'gopher.example.com');
+  assertEquals(menuItem.port, 70);
 });
 
 Deno.test('MenuItem parses selectors with spaces', () => {
   const line = '0One Two	/One Two.txt	gopher.example.com	70	+';
   const menuItem = new MenuItem(line);
 
-  assertEquals(menuItem.Type, '0');
-  assertEquals(menuItem.Name, 'One Two');
-  assertEquals(menuItem.Selector, '/One Two.txt');
-  assertEquals(menuItem.Hostname, 'gopher.example.com');
-  assertEquals(menuItem.Port, 70);
+  assertEquals(menuItem.type, '0');
+  assertEquals(menuItem.name, 'One Two');
+  assertEquals(menuItem.selector, '/One Two.txt');
+  assertEquals(menuItem.hostname, 'gopher.example.com');
+  assertEquals(menuItem.port, 70);
 });
 
 Deno.test('MenuItem parses informational menu item', () => {
   const line = 'iThis is info	fake	(NULL)	0';
   const menuItem = new MenuItem(line);
 
-  assertEquals(menuItem.Type, 'i');
-  assertEquals(menuItem.Name, 'This is info');
-  assertEquals(menuItem.Selector, 'fake');
-  assertEquals(menuItem.Hostname, '(NULL)');
-  assertEquals(menuItem.Port, 0);
+  assertEquals(menuItem.type, 'i');
+  assertEquals(menuItem.name, 'This is info');
+  assertEquals(menuItem.selector, 'fake');
+  assertEquals(menuItem.hostname, '(NULL)');
+  assertEquals(menuItem.port, 0);
 });
 
 Deno.test('MenuItem parses empty informational menu item', () => {
   const line = 'i	fake	(NULL)	0';
   const menuItem = new MenuItem(line);
 
-  assertEquals(menuItem.Type, 'i');
-  assertEquals(menuItem.Name, '');
-  assertEquals(menuItem.Selector, 'fake');
-  assertEquals(menuItem.Hostname, '(NULL)');
-  assertEquals(menuItem.Port, 0);
+  assertEquals(menuItem.type, 'i');
+  assertEquals(menuItem.name, '');
+  assertEquals(menuItem.selector, 'fake');
+  assertEquals(menuItem.hostname, '(NULL)');
+  assertEquals(menuItem.port, 0);
 });

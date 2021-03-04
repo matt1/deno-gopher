@@ -23,19 +23,19 @@ export class MenuItem extends GopherItem {
 
   constructor(menuItemString: string) {
     super();
-    this.Original = menuItemString;
-    this.Type = menuItemString.substring(0, 1) as ItemType;
+    this.original = menuItemString;
+    this.type = menuItemString.substring(0, 1) as ItemType;
     const parts = menuItemString.substring(1).split('\t');
-    this.Name = parts[0];
-    this.Selector = parts[1];
-    this.Hostname = parts[2];
-    this.Port = Number(parts[3]);
+    this.name = parts[0];
+    this.selector = parts[1];
+    this.hostname = parts[2];
+    this.port = Number(parts[3]);
   }
 
   toString(): string {
-    if (this.Selector === 'fake' || this.Port === 0 || this.Hostname === '(NULL)') {
-      return `${this.Type} ${this.Name}`;
+    if (this.selector === 'fake' || this.port === 0 || this.hostname === '(NULL)') {
+      return `${this.type} ${this.name}`;
     }
-    return `${this.Type} ${this.Name} gopher://${this.Hostname}:${this.Port}${this.Selector}`;
+    return `${this.type} ${this.name} gopher://${this.hostname}:${this.port}${this.selector}`;
   }
 }
