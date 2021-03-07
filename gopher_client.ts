@@ -7,7 +7,13 @@ import {GopherRequest} from './gopher_request.ts';
 /** A client for interacting with Gopher servers. */
 export class GopherClient {
   /** The version of the Gopher protocol this client will use. */
-  protocolVersion:GopherProtocol;
+  readonly protocolVersion:GopherProtocol;
+
+  /** 
+   * Try to use TLS when connecting to servers - N.B. Deno does not yet allow
+   * us to set the TLS ALPN or SNI properties so this will not work until then.
+   */
+  readonly useTls:boolean;
 
   /**
    * The handler for the protocol - understands how to turn raw bytes into
@@ -23,6 +29,7 @@ export class GopherClient {
 
   constructor(options?:GopherClientOptions){
     this.protocolVersion = options?.protocolVersion || GopherProtocol.RFC1436;
+    this.useTls = options?.useTls || false;
 
     if (this.protocolVersion === GopherProtocol.RFC1436) {
       this.handler = new GopherHandler(options);
@@ -103,11 +110,18 @@ export class GopherClient {
     let connection;
     let result:Uint8Array = new Uint8Array(0);
     try {
-      connection = await Deno.connect({
-        hostname: options.hostname,
-        port: options.port || 70,
-        transport: 'tcp'
-      });
+      if (this.useTls) {
+        connection = await Deno.connectTls({
+          hostname: options.hostname,
+          port: options.port || 70,
+        });
+      } else {
+        connection = await Deno.connect({
+          hostname: options.hostname,
+          port: options.port || 70,
+          transport: 'tcp'
+        });
+      }
       await connection.write(new TextEncoder().encode(query));
       let buf = new Uint8Array(this.BUFFER_SIZE);
       let bytesRead: number | null = 0;
@@ -116,9 +130,9 @@ export class GopherClient {
         result = this.concatenateUint8Arrays(result, buf.slice(0, bytesRead!));
         buf = new Uint8Array(this.BUFFER_SIZE);
       } while (bytesRead && bytesRead > 0);
-    } catch (error) {
-      throw new Error(`Error downloading bytes from Gopher server: ${error}.`);
-    } finally {
+     } catch (error) {
+       throw new Error(`Error downloading bytes from Gopher server: ${error}.`);
+     } finally {
       if (connection) {
         connection.close();
       }
@@ -131,4 +145,6 @@ export class GopherClient {
 export interface GopherClientOptions {
   /** Version of the protocol to use. */
   protocolVersion: GopherProtocol,
+  /** Attempt to use TLS when connecting to servers. */
+  useTls:boolean;
 }

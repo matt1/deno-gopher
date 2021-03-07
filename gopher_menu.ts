@@ -13,6 +13,7 @@ export class Menu extends GopherItem {
     const lines = menuString.split(CRLF);
     for (const line of lines) {
       if (!line) continue;
+      if (line === `.`) break;
       this.items.push(new MenuItem(line));
     }
   }
