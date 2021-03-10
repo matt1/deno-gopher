@@ -18,6 +18,7 @@ try {
   
   const response = await client.downloadItem(lastItem!);
   console.log(response!);
+  console.log(`Request used TLS? ${response.tls}`);
   console.log(`Timing info for Gopher Request:
     Waiting for connection: ${response.timing.waitingDurationMillis}ms
     Waiting for first byte: ${response.timing.waitingForFirstByteDurationMillis}ms

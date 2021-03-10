@@ -10,9 +10,7 @@ export class GopherTimingInfo {
    * @param readCompleteMillis Timestamp when read stopped.
    */
   constructor(readonly startMillis:number, readonly writeStartMillis:number,
-    readonly readStartMillis:number, readonly readCompleteMillis:number){
-    
-  }
+    readonly readStartMillis:number, readonly readCompleteMillis:number){}
 
   /** Total duration of the request. */
   public get totalDurationMillis() : number {
@@ -58,7 +56,13 @@ export class GopherResponse {
     return this.header.length;
   }
 
-  constructor(readonly rawBytes:Uint8Array, readonly protocol:GopherProtocol, readonly timing:GopherTimingInfo) {
+  /**
+   * @param rawBytes Raw byte content of the response.
+   * @param protocol Protocol used for the response.
+   * @param timing GopherTimingInfo contain timing info about this response.
+   * @param tls Flag to indicate if this response was via a TLS connection.
+   */
+  constructor(readonly rawBytes:Uint8Array, readonly protocol:GopherProtocol, readonly timing:GopherTimingInfo, readonly tls = false) {
     if (this.protocol === GopherProtocol.GopherPlus) {
       this.processGopherPlus(rawBytes);
     } else {

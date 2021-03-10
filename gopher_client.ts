@@ -11,10 +11,12 @@ export class GopherClient {
 
   /** 
    * Try to use TLS when connecting to servers - N.B. Deno does not yet allow
-   * us to set the TLS ALPN or SNI properties so this will not work until then.
+   * us to set the TLS ALPN property so this may not work until then, depending
+   * on server support (GoT requires ALPN for example).
+   * 
    * Defaults to false.
    */
-  readonly useTls?:boolean = false;
+  readonly tls?:boolean = false;
 
   /**
    * The handler for the protocol - understands how to turn raw bytes into
@@ -30,7 +32,7 @@ export class GopherClient {
 
   constructor(options?:GopherClientOptions){
     this.protocolVersion = options?.protocolVersion || GopherProtocol.RFC1436;
-    this.useTls = options?.useTls || false;
+    this.tls = options?.useTls || false;
 
     if (this.protocolVersion === GopherProtocol.RFC1436) {
       this.handler = new GopherHandler(options);
@@ -116,7 +118,9 @@ export class GopherClient {
     let bytesRead: number | null = 0;
     const startMillis = Date.now();
     try {
-      if (this.useTls) {
+      if (this.tls) {
+        // TODO: handle scenario where we need to fail-over from TLS to plain
+        // text.
         connection = await Deno.connectTls({
           hostname: options.hostname,
           port: options.port || 70,
@@ -149,7 +153,7 @@ export class GopherClient {
       writeStartMillis,
       readStartMillis,
       readCompleteMillis
-    ));
+    ), this.tls);
   }
 }
 
