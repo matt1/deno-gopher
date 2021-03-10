@@ -2,7 +2,7 @@ import {GopherClient, GopherProtocol, MenuItem} from './mod.ts';
 
 const client = new GopherClient({
   protocolVersion: GopherProtocol.RFC1436,
-  useTls: false,
+  tls: false,
 });
 
 try {

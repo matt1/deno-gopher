@@ -13,7 +13,7 @@ import {GopherClient} from 'https://deno.land/x/gopher/mod.ts';
 // Create a new GopherClient, optionally specifying the protocol version to use.
 const client = new GopherClient({
   protocolVersion: GopherProtocol.RFC1436,
-  useTls: false,
+  tls: false,
 });
 
 try {

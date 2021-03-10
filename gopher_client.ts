@@ -32,7 +32,7 @@ export class GopherClient {
 
   constructor(options?:GopherClientOptions){
     this.protocolVersion = options?.protocolVersion || GopherProtocol.RFC1436;
-    this.tls = options?.useTls || false;
+    this.tls = options?.tls || false;
 
     if (this.protocolVersion === GopherProtocol.RFC1436) {
       this.handler = new GopherHandler(options);
@@ -162,5 +162,5 @@ export interface GopherClientOptions {
   /** Version of the protocol to use. */
   protocolVersion: GopherProtocol,
   /** Attempt to use TLS when connecting to servers. */
-  useTls?:boolean;
+  tls?:boolean;
 }
