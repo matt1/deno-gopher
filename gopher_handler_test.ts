@@ -1,7 +1,7 @@
 import {assertEquals} from 'https://deno.land/std@0.87.0/testing/asserts.ts';
 import {GopherProtocol} from './gopher_common.ts';
 import {GopherHandler} from './gopher_handler.ts';
-import {GopherResponse} from './gopher_response.ts';
+import {GopherResponse, GopherTimingInfo} from './gopher_response.ts';
 
 const GOPHER0_RESPONSE = new TextEncoder().encode(
   '1A Menu	/A/Menu	gopher.example.com	70\r\n' +
@@ -17,9 +17,11 @@ const GOPHERP_RESPONSE = new TextEncoder().encode(
   '1A Menu	/A/Menu	gopher.example.com	70\r\n' +
   '0A-Text_File!	/A Text File.txt	gopher.example.com	70	+\r\n');
 
+const DUMMY_TIMING = new GopherTimingInfo(1, 2, 3, 4);
+
 Deno.test('GopherHandler parses well-formed Gopher0 response', () => {
   const handler = new GopherHandler();
-  const response = new GopherResponse(GOPHER0_RESPONSE, GopherProtocol.RFC1436);
+  const response = new GopherResponse(GOPHER0_RESPONSE, GopherProtocol.RFC1436, DUMMY_TIMING);
 
   const menu = handler.parseMenu(response);
   assertEquals(menu.items.length, 2);
@@ -38,7 +40,7 @@ Deno.test('GopherHandler parses well-formed Gopher0 response', () => {
 
 Deno.test('GopherHandler parses well-formed Gopher0 response (full stop terminated)', () => {
   const handler = new GopherHandler();
-  const response = new GopherResponse(GOPHER0_RESPONSE_FULLSTOP_TERMINATED, GopherProtocol.RFC1436);
+  const response = new GopherResponse(GOPHER0_RESPONSE_FULLSTOP_TERMINATED, GopherProtocol.RFC1436, DUMMY_TIMING);
 
   const menu = handler.parseMenu(response);
   assertEquals(menu.items.length, 2);
@@ -57,7 +59,7 @@ Deno.test('GopherHandler parses well-formed Gopher0 response (full stop terminat
 
 Deno.test('GopherHandler parses well-formed Gopher+ response', () => {
   const handler = new GopherHandler();
-  const response = new GopherResponse(GOPHERP_RESPONSE, GopherProtocol.GopherPlus);
+  const response = new GopherResponse(GOPHERP_RESPONSE, GopherProtocol.GopherPlus, DUMMY_TIMING);
 
   const menu = handler.parseMenu(response);
   assertEquals(menu.items.length, 2);

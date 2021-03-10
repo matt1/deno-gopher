@@ -1,13 +1,13 @@
 import {GopherClient, GopherProtocol, MenuItem} from './mod.ts';
 
 const client = new GopherClient({
-  protocolVersion: GopherProtocol.GopherPlus,
+  protocolVersion: GopherProtocol.RFC1436,
   useTls: false,
 });
 
 try {
   const menu = await client.downloadMenu({
-    hostname: 'gopher.quux.org',
+    hostname: 'bitreich.org',
   });
 
   let lastItem:MenuItem;
@@ -16,8 +16,13 @@ try {
     lastItem = menuItem;
   }
   
-  await client.populateAttributes(lastItem!);
-  console.log(lastItem!);
+  const response = await client.downloadItem(lastItem!);
+  console.log(response!);
+  console.log(`Timing info for Gopher Request:
+    Waiting for connection: ${response.timing.waitingDurationMillis}ms
+    Waiting for first byte: ${response.timing.waitingForFirstByteDurationMillis}ms
+    Receiving time:         ${response.timing.recievingDuratrionMillis}ms
+    Total request duration: ${response.timing.totalDurationMillis}ms`);
 
 } catch (error) {
   console.error(`Unexpected error downloading from Gopher server! ${error}`);

@@ -1,14 +1,64 @@
 import {GopherProtocol} from './gopher_common.ts';
 
+/** Contains timing information related to a Gopher response. */
+export class GopherTimingInfo {
+  /**
+   * 
+   * @param startMillis Timestamp when request started, before any connection has been attemted.
+   * @param writeStartMillis Timestamp when write to socket started after successful connection.
+   * @param readStartMillis Timestamp when read from socket started. 
+   * @param readCompleteMillis Timestamp when read stopped.
+   */
+  constructor(readonly startMillis:number, readonly writeStartMillis:number,
+    readonly readStartMillis:number, readonly readCompleteMillis:number){
+    
+  }
+
+  /** Total duration of the request. */
+  public get totalDurationMillis() : number {
+    return this.readCompleteMillis - this.startMillis;
+  }
+
+  /** Total time spent waiting for connection */
+  public get waitingDurationMillis() : number {
+    return this.writeStartMillis - this.startMillis;
+  }
+
+  /** Total time spent waiting for first byte. */
+  public get waitingForFirstByteDurationMillis() : number {
+    return this.readStartMillis - this.writeStartMillis;
+  }
+
+  /** Total time spent recieving data. */
+  public get recievingDuratrionMillis() : number {
+    return this.readCompleteMillis - this.readStartMillis;
+  }
+}
+
 /** Represents a response from the Gopher server. */
 export class GopherResponse {
-  /** The Gopher+ header bytes. May be undefined. */
-  header!:Uint8Array;
+  /** The Gopher+ header bytes. May be zero-length (e.g. for Gopher0 responses). */
+  header = new Uint8Array(0);
 
   /** Main body of the response. */
-  body!:Uint8Array;
+  body = new Uint8Array(0);
 
-  constructor(readonly rawBytes:Uint8Array, readonly protocol:GopherProtocol) {
+  /** Get total size of response in bytes. */
+  public get responseSize(): number {
+    return this.body.length + this.header.length;
+  }
+
+  /** Get total size of the body in bytes. */
+  public get bodySize(): number {
+    return this.body.length;
+  }
+
+  /** Get total size of the header in bytes. */
+  public get headerSize(): number {
+    return this.header.length;
+  }
+
+  constructor(readonly rawBytes:Uint8Array, readonly protocol:GopherProtocol, readonly timing:GopherTimingInfo) {
     if (this.protocol === GopherProtocol.GopherPlus) {
       this.processGopherPlus(rawBytes);
     } else {

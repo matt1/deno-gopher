@@ -1,7 +1,7 @@
 import {GopherProtocol} from './gopher_common.ts';
 import {GopherHandler, GopherPlusHandler} from './gopher_handler.ts';
 import {Menu, MenuItem} from './gopher_menu.ts';
-import {GopherResponse} from './gopher_response.ts';
+import {GopherResponse, GopherTimingInfo} from './gopher_response.ts';
 import {GopherRequest} from './gopher_request.ts';
 
 /** A client for interacting with Gopher servers. */
@@ -12,8 +12,9 @@ export class GopherClient {
   /** 
    * Try to use TLS when connecting to servers - N.B. Deno does not yet allow
    * us to set the TLS ALPN or SNI properties so this will not work until then.
+   * Defaults to false.
    */
-  readonly useTls:boolean;
+  readonly useTls?:boolean = false;
 
   /**
    * The handler for the protocol - understands how to turn raw bytes into
@@ -107,8 +108,13 @@ export class GopherClient {
    * for downloading text files or images etc.
    */
   private async downloadBytes(options:GopherRequest, query:string): Promise<GopherResponse> {
-    let connection;
+    let connection;    
     let result:Uint8Array = new Uint8Array(0);
+    let writeStartMillis:number;
+    let readStartMillis!:number;
+    let buffer = new Uint8Array(this.BUFFER_SIZE);
+    let bytesRead: number | null = 0;
+    const startMillis = Date.now();
     try {
       if (this.useTls) {
         connection = await Deno.connectTls({
@@ -122,13 +128,13 @@ export class GopherClient {
           transport: 'tcp'
         });
       }
+      writeStartMillis = Date.now();
       await connection.write(new TextEncoder().encode(query));
-      let buf = new Uint8Array(this.BUFFER_SIZE);
-      let bytesRead: number | null = 0;
       do {
-        bytesRead = await connection.read(buf);
-        result = this.concatenateUint8Arrays(result, buf.slice(0, bytesRead!));
-        buf = new Uint8Array(this.BUFFER_SIZE);
+        bytesRead = await connection.read(buffer);
+        if (!readStartMillis) readStartMillis = Date.now();
+        result = this.concatenateUint8Arrays(result, buffer.slice(0, bytesRead!));
+        buffer = new Uint8Array(this.BUFFER_SIZE);
       } while (bytesRead && bytesRead > 0);
      } catch (error) {
        throw new Error(`Error downloading bytes from Gopher server: ${error}.`);
@@ -137,7 +143,13 @@ export class GopherClient {
         connection.close();
       }
     }
-    return new GopherResponse(result, this.protocolVersion);
+    const readCompleteMillis = Date.now();
+    return new GopherResponse(result, this.protocolVersion, new GopherTimingInfo(
+      startMillis,
+      writeStartMillis,
+      readStartMillis,
+      readCompleteMillis
+    ));
   }
 }
 
@@ -146,5 +158,5 @@ export interface GopherClientOptions {
   /** Version of the protocol to use. */
   protocolVersion: GopherProtocol,
   /** Attempt to use TLS when connecting to servers. */
-  useTls:boolean;
+  useTls?:boolean;
 }

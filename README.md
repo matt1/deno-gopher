@@ -13,27 +13,47 @@ import {GopherClient} from 'https://deno.land/x/gopher/mod.ts';
 // Create a new GopherClient, optionally specifying the protocol version to use.
 const client = new GopherClient({
   protocolVersion: GopherProtocol.RFC1436,
+  useTls: false,
 });
 
-// Download the Gopher server's menu.
-const menu = await client.downloadMenu({
-  hostname: 'gopher.example.com',
-  // Optional: port (default 70)
-  // Optional: selector (e.g. '/foo')
-});
+try {
+  // Download the Gopher server's menu.
+  const menu = await client.downloadMenu({
+    hostname: 'gopher.example.com',
+    // Optional: port (default 70)
+    // Optional: selector (e.g. '/foo')
+  });
 
-// To display the menu items.
-for (const menuItem of menu.Items) {
-  console.log(menuItem.toString());
+  // To display the menu items.
+  for (const menuItem of menu.Items) {
+    console.log(menuItem.toString());
+  }
+
+  // To download a single menu item - the response contains the body and header
+  // (if it was  Gopher+ response) as well as some timing information:
+  const gopherResponse = client.downloadItem(menuItem);
+
+  /** Output timing info for the server response, e.g.
+   * ```
+   *  Timing info for Gopher Request:
+   *  Waiting for connection: 94ms
+   *  Waiting for first byte: 92ms
+   *  Receiving time:         1ms
+   *  Total request duration: 187ms
+   * ```
+   */
+  console.log(`Timing info for Gopher Request:
+    Waiting for connection: ${gopherResponse.timing.waitingDurationMillis}ms
+    Waiting for first byte: ${gopherResponse.timing.waitingForFirstByteDurationMillis}ms
+    Receiving time:         ${gopherResponse.timing.recievingDuratrionMillis}ms
+    Total request duration: ${gopherResponse.timing.totalDurationMillis}ms`);
+
+  // If it was a text entry (use the MenuItem.Type field to check) then you can
+  // easily convert to a string.
+  const text = new TextDecoder().decode(gopherResponse.body);
+} catch (error) {
+  console.error(`Error downloading from Gopher: ${error}`);
 }
-
-// To download a single menu item - the response contains the body and header
-// (if it was  Gopher+ response):
-const gopherResponse = client.downloadItem(menuItem);
-
-// If it was a text entry (use the MenuItem.Type field to check) then you can
-// easily convert to a string.
-const text = new TextDecoder().decode(gopherResponse.body);
 ```
 
 # Getting Gopher+ attributes
