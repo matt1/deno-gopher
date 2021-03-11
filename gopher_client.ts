@@ -56,8 +56,10 @@ export class GopherClient {
     return await this.downloadBytes(request, this.handler.generateSelectorString(request.selector));
   }
 
+  /** Make a search request to the Gopher server - returns a menu of results. */
   async search(request:GopherRequest): Promise<Menu> {
-    const response = await this.downloadBytes(request, this.handler.generaeteQueryString(request.selector, request.query!));
+    if (!request.query) throw new Error('No query provided for search');
+    const response = await this.downloadBytes(request, this.handler.generaeteQueryString(request.selector, request.query));
     const menu =  this.handler.parseMenu(response);
     menu.hostname = request.hostname;
     menu.port = request.port || 70;
