@@ -15,12 +15,14 @@ Deno.test('Menu parses well-formed menu', () => {
   assertEquals(menu.items[0].selector, '/A/Menu');
   assertEquals(menu.items[0].hostname, 'gopher.example.com');
   assertEquals(menu.items[0].port, 70);
+  assertEquals(menu.items[0].gopherPlus, false);
 
   assertEquals(menu.items[1].type, '0');
   assertEquals(menu.items[1].name, 'A-Text_File!');
   assertEquals(menu.items[1].selector, '/A Text File.txt');
   assertEquals(menu.items[1].hostname, 'gopher.example.com');
   assertEquals(menu.items[1].port, 70);
+  assertEquals(menu.items[1].gopherPlus, true);
 
   assertEquals(menu.items[2].type, 'I');
   assertEquals(menu.items[2].name, 'An image');

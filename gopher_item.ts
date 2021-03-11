@@ -18,11 +18,28 @@ export class ItemAttributes {
 
 /** Represents an item in a Gopher menu. */
 export abstract class GopherItem {
+  /** The type of this menu item - e.g. 'i' or '1' etc. */
   type: ItemType = new UnknownType('?');
+  
+  /**
+   * The name or description of this item. Typically this is the user-visible
+   * part of the menu item that is shown in Gopher clients.
+   */
   name: string = '';
+  
+  /** Menu selector itself, e.g. `/foo` */
   selector: string = 'fake';
+  
+  /** Hostname */
   hostname: string = '';
-  port: number = 0;
+  
+  /** Port number. */
+  port: number = 0;  
+  
+  /** Flag inidicating if this item supports Gopher+ */
+  gopherPlus: boolean = false;
+  
+  /** Original raw string for this item. */
   original: string = '';
 
   /** Gopher+ Attribute map for this item. May not be populated. */

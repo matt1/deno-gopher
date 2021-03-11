@@ -31,6 +31,7 @@ export class MenuItem extends GopherItem {
     this.selector = parts[1];
     this.hostname = parts[2];
     this.port = Number(parts[3]);
+    if (parts[4] && parts[4] === '+') this.gopherPlus = true;
   }
 
   toString(): string {
