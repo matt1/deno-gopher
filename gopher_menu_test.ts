@@ -29,18 +29,21 @@ Deno.test('Menu parses well-formed menu', () => {
   assertEquals(menu.items[2].selector, '/image.gif');
   assertEquals(menu.items[2].hostname, 'gopher.example.com');
   assertEquals(menu.items[2].port, 70);
+  assertEquals(menu.items[2].gopherPlus, false);
 
   assertEquals(menu.items[3].type, 'i');
   assertEquals(menu.items[3].name, 'Information');
   assertEquals(menu.items[3].selector, 'fake');
   assertEquals(menu.items[3].hostname, '(NULL)');
   assertEquals(menu.items[3].port, 0);
+  assertEquals(menu.items[3].gopherPlus, false);
 
   assertEquals(menu.items[4].type, 'i');
   assertEquals(menu.items[4].name, '');
   assertEquals(menu.items[4].selector, 'fake');
   assertEquals(menu.items[4].hostname, '(NULL)');
   assertEquals(menu.items[4].port, 0);
+  assertEquals(menu.items[4].gopherPlus, false);
 });
 
 Deno.test('MenuItem parses well-formed menu item', () => {
@@ -63,6 +66,7 @@ Deno.test('MenuItem parses well-formed Gopher+ menu item', () => {
   assertEquals(menuItem.selector, '/home');
   assertEquals(menuItem.hostname, 'gopher.example.com');
   assertEquals(menuItem.port, 70);
+  assertEquals(menuItem.gopherPlus, true);
 });
 
 Deno.test('MenuItem parses selectors with spaces', () => {
@@ -74,6 +78,7 @@ Deno.test('MenuItem parses selectors with spaces', () => {
   assertEquals(menuItem.selector, '/One Two.txt');
   assertEquals(menuItem.hostname, 'gopher.example.com');
   assertEquals(menuItem.port, 70);
+  assertEquals(menuItem.gopherPlus, true);
 });
 
 Deno.test('MenuItem parses informational menu item', () => {
@@ -85,6 +90,7 @@ Deno.test('MenuItem parses informational menu item', () => {
   assertEquals(menuItem.selector, 'fake');
   assertEquals(menuItem.hostname, '(NULL)');
   assertEquals(menuItem.port, 0);
+  assertEquals(menuItem.gopherPlus, false);
 });
 
 Deno.test('MenuItem parses empty informational menu item', () => {
@@ -96,4 +102,5 @@ Deno.test('MenuItem parses empty informational menu item', () => {
   assertEquals(menuItem.selector, 'fake');
   assertEquals(menuItem.hostname, '(NULL)');
   assertEquals(menuItem.port, 0);
+  assertEquals(menuItem.gopherPlus, false);
 });
