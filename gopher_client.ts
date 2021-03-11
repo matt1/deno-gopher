@@ -43,7 +43,7 @@ export class GopherClient {
 
   /** Make a request to a Gopher server to download a menu. */
   async downloadMenu(request:GopherRequest): Promise<Menu> {
-    const response = await this.downloadBytes(request, this.handler.generateQueryString(request.selector));
+    const response = await this.downloadBytes(request, this.handler.generateSelectorString(request.selector));
     const menu =  this.handler.parseMenu(response);
     menu.hostname = request.hostname;
     menu.port = request.port || 70;
@@ -53,7 +53,16 @@ export class GopherClient {
 
   /** Make a request to the Gopher server to download an item as raw bytes. */
   async downloadItem(request:GopherRequest): Promise<GopherResponse> {
-    return await this.downloadBytes(request, this.handler.generateQueryString(request.selector));
+    return await this.downloadBytes(request, this.handler.generateSelectorString(request.selector));
+  }
+
+  async search(request:GopherRequest): Promise<Menu> {
+    const response = await this.downloadBytes(request, this.handler.generaeteQueryString(request.selector, request.query!));
+    const menu =  this.handler.parseMenu(response);
+    menu.hostname = request.hostname;
+    menu.port = request.port || 70;
+    menu.selector = request.selector || '';
+    return menu;
   }
 
   /** Get the Gopher+ attributes for the entire menu at once. */
@@ -141,7 +150,7 @@ export class GopherClient {
         buffer = new Uint8Array(this.BUFFER_SIZE);
       } while (bytesRead && bytesRead > 0);
      } catch (error) {
-       throw new Error(`Error downloading bytes from Gopher server: ${error}.`);
+       throw error;
      } finally {
       if (connection) {
         connection.close();

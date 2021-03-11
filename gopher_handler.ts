@@ -13,14 +13,19 @@ export class GopherHandler {
   }
 
   /** Generates a selector string to be sent to the server. */
-  generateQueryString(selector:string|undefined):string {
+  generateSelectorString(selector:string|undefined):string {
     return `${selector || ''}${CRLF}`;
+  }
+
+  /** Generates a query string for use with a search server. */
+  generaeteQueryString(selector:string|undefined, query:string):string {
+    return `${selector || ''}\t${query}${CRLF}`
   }
 }
 
 /** Handler for Gopher+. */
 export class GopherPlusHandler extends GopherHandler {
-  generateQueryString(selector:string|undefined):string {
+  generateSelectorString(selector:string|undefined):string {
     return `${selector || ''}\t+${CRLF}`;
   }
 
