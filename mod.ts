@@ -6,4 +6,4 @@ export * from './gopher_menu.ts';
 export * from './gopher_request.ts';
 export * from './gopher_response.ts';
 export * from './gopher_types.ts';
-export * from './gopher_utils';
+export * from './gopher_utils.ts';
