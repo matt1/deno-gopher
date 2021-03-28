@@ -1,7 +1,7 @@
 /** 
  * Regular expression used for parsing well-formed gopher URIs.
  * 
- * Group 1 - scheme (e.g. `gopher`), or udnefined if not provided.
+ * Group 1 - scheme (e.g. `gopher`), or undefined if not provided.
  * Group 2 - host.
  * Group 3 - port, or undefined if not provided.
  * Group 4 - selector, or undefined if not provided.
