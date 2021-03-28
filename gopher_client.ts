@@ -59,6 +59,7 @@ export class GopherClient {
   /** Make a search request to the Gopher server - returns a menu of results. */
   async search(request:GopherRequest): Promise<Menu> {
     if (!request.query) throw new Error('No query provided for search');
+    // TODO: verify query is valid - https://tools.ietf.org/html/rfc1436#page-14
     const response = await this.downloadBytes(request, this.handler.generaeteQueryString(request.selector, request.query));
     const menu =  this.handler.parseMenu(response);
     menu.hostname = request.hostname;
