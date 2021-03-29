@@ -21,7 +21,9 @@ Deno.test('Gopher Utils URI regex accepts valid Gopher URIs', () => {
 Deno.test('Gopher Utils URI regex rejects invalid Gopher URIs', () => {
   assertEquals(false, URI_REGEX.test(''));
   assertEquals(false, URI_REGEX.test('foo'));
-  assertEquals(false, URI_REGEX.test('foo bar'));
+  assertEquals(false, URI_REGEX.test('foo.'));
+  assertEquals(false, URI_REGEX.test('foo bar'));  
+  assertEquals(false, URI_REGEX.test('http://example.com'));
   assertEquals(false, URI_REGEX.test('http://example.com'));
   assertEquals(false, URI_REGEX.test('http://example.com:70'));
   assertEquals(false, URI_REGEX.test('http://example.com/'));
