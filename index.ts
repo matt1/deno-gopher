@@ -1,14 +1,18 @@
-import {GopherClient, GopherProtocol, MenuItem} from './mod.ts';
+import {GopherClient, GopherProtocol, MenuItem, TlsSupport} from './mod.ts';
 
 const client = new GopherClient({
   protocolVersion: GopherProtocol.RFC1436,
-  tls: false,
 });
 
 try {
-  const menu = await client.downloadMenu({
+  const menuResponse = await client.downloadItem({
     hostname: 'bitreich.org',
+    tls: TlsSupport.PreferTls,
   });
+
+  const menu = client.handler.parseMenu(menuResponse);
+
+  console.log(`Response used TLS? ${menuResponse.tls}`);
 
   let lastItem:MenuItem;
   for (const menuItem of menu.items) {

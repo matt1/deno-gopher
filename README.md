@@ -13,18 +13,19 @@ import {GopherClient} from 'https://deno.land/x/gopher/mod.ts';
 // Create a new GopherClient, optionally specifying the protocol version to use.
 const client = new GopherClient({
   protocolVersion: GopherProtocol.RFC1436,
-  tls: false,
 });
 
 try {
   // Download the Gopher server's menu.
-  const menu = await client.downloadMenu({
+  const menuBytes = await client.downloadItem({
     hostname: 'gopher.example.com',
+    tls: TlsSupport.PreferTls,
     // Optional: port (default 70)
     // Optional: selector (e.g. '/foo')
   });
 
   // To display the menu items.
+  const menu = client.handler.parseMenu(menuBytes);
   for (const menuItem of menu.Items) {
     console.log(menuItem.toString());
   }

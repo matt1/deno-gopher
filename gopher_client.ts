@@ -2,22 +2,12 @@ import {GopherProtocol} from './gopher_common.ts';
 import {GopherHandler, GopherPlusHandler} from './gopher_handler.ts';
 import {Menu, MenuItem} from './gopher_menu.ts';
 import {GopherResponse, GopherTimingInfo} from './gopher_response.ts';
-import {GopherRequest} from './gopher_request.ts';
+import {GopherRequest, TlsSupport} from './gopher_request.ts';
 
 /** A client for interacting with Gopher servers. */
 export class GopherClient {
   /** The version of the Gopher protocol this client will use. */
   readonly protocolVersion:GopherProtocol;
-
-  /** 
-   * Try to use TLS when connecting to servers - N.B. Deno does not yet allow
-   * us to set the TLS ALPN property so this may not work until then, depending
-   * on server support (GoT requires ALPN for example).
-   * 
-   * Defaults to false.
-   */
-  readonly tls?:boolean = false;
-
   /**
    * The handler for the protocol - understands how to turn raw bytes into
    * parsed responses etc.
@@ -32,7 +22,6 @@ export class GopherClient {
 
   constructor(options?:GopherClientOptions){
     this.protocolVersion = options?.protocolVersion || GopherProtocol.RFC1436;
-    this.tls = options?.tls || false;
 
     if (this.protocolVersion === GopherProtocol.RFC1436) {
       this.handler = new GopherHandler(options);
@@ -122,7 +111,8 @@ export class GopherClient {
    * for downloading text files or images etc.
    */
   private async downloadBytes(options:GopherRequest, query:string): Promise<GopherResponse> {
-    let connection;    
+    let connectionAttempt:GopherConnectionResult;
+    let connection!: Deno.Conn;
     let result:Uint8Array = new Uint8Array(0);
     let writeStartMillis:number;
     let readStartMillis!:number;
@@ -130,24 +120,14 @@ export class GopherClient {
     let bytesRead: number | null = 0;
     const startMillis = Date.now();
     try {
-      if (this.tls) {
-        // TODO: handle scenario where we need to fail-over from TLS to plain
-        // text.
-        connection = await Deno.connectTls({
-          hostname: options.hostname,
-          port: options.port || 70,
-        });
-      } else {
-        connection = await Deno.connect({
-          hostname: options.hostname,
-          port: options.port || 70,
-          transport: 'tcp'
-        });
+      connectionAttempt = await this.getConnection(options);
+      if (!connectionAttempt.connection) {
+        throw connectionAttempt.error;
       }
       writeStartMillis = Date.now();
-      await connection.write(new TextEncoder().encode(query));
+      await connectionAttempt.connection.write(new TextEncoder().encode(query));
       do {
-        bytesRead = await connection.read(buffer);
+        bytesRead = await connectionAttempt.connection.read(buffer);
         if (!readStartMillis) readStartMillis = Date.now();
         result = this.concatenateUint8Arrays(result, buffer.slice(0, bytesRead!));
         buffer = new Uint8Array(this.BUFFER_SIZE);
@@ -155,7 +135,7 @@ export class GopherClient {
      } catch (error) {
        throw error;
      } finally {
-      if (connection) {
+      if (connection !== undefined) {
         connection.close();
       }
     }
@@ -165,7 +145,42 @@ export class GopherClient {
       writeStartMillis,
       readStartMillis,
       readCompleteMillis
-    ), this.tls);
+    ), connectionAttempt.tlsUsed);
+  }
+
+  /** 
+   * Attempt to get the right type of connection, based on what this request
+   * requires - i.e. no TLS, prefer TLS, or TLS only.
+   */
+  private async getConnection(options:GopherRequest): Promise<GopherConnectionResult> {
+    
+    if (options.tls === undefined || options.tls === TlsSupport.DoNotUseTls) {
+      const connection = await Deno.connect({
+        hostname: options.hostname,
+        port: options.port || 70,
+      });
+      return {connection, tlsUsed: false};
+    } else if (options.tls === TlsSupport.PreferTls) {
+      try {
+        const connection = await Deno.connectTls({
+          hostname: options.hostname,
+          port: options.port || 70,
+        });
+        return {connection, tlsUsed:true};
+      } catch (error) {
+        const connection = await Deno.connect({
+          hostname: options.hostname,
+          port: options.port || 70,
+         });
+         return {connection, tlsUsed:false};
+      }
+     } else {  // OnlyTls
+      const connection = await Deno.connectTls({
+        hostname: options.hostname,
+        port: options.port || 70,
+      });
+      return {connection, tlsUsed:true};
+    }
   }
 }
 
@@ -173,6 +188,14 @@ export class GopherClient {
 export interface GopherClientOptions {
   /** Version of the protocol to use. */
   protocolVersion: GopherProtocol,
-  /** Attempt to use TLS when connecting to servers. */
-  tls?:boolean;
+}
+
+/** Result of getting a gopher connection. */
+export interface GopherConnectionResult {
+  /** Promise from the connection itself. */
+  connection?: Deno.Conn|undefined,
+  /** Flag to indicate if the connection was TLS or not. */
+  tlsUsed?: boolean;
+  /** Any error that might have been raised during connection. */
+  error?:Error|undefined;
 }
